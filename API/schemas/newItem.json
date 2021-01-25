@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
+  "default": {},
+  "examples": [
+      {
+          "id": "123e4567-e89b-12d3-a456-426614174000",
+          "title": "moominmug",
+          "description": "this is very nice moominmug",
+          "category": "mugs",
+          "location": {
+              "zipCode": 90520,
+              "city": "Oulu"
+          },
+          "imageNames": [
+              "picture1.jpg",
+              "picture2.jpg"
+          ],
+          "askingPrice": 35.4,
+          "deliveryType": {
+              "shipping": true,
+              "pickup": false
+          },
+          "sellerId": "123e4567-e89b-12d3-a456-426614174000"
+      }
+  ],
+  "required": [
+      "id",
+      "title",
+      "description",
+      "category",
+      "location",
+      "imageNames",
+      "askingPrice",
+      "deliveryType",
+      "sellerId"
+  ],
+  "properties": {
+      "id": {
+          "$id": "#/properties/id",
+          "type": "string",
+          "title": "The id schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "123e4567-e89b-12d3-a456-426614174000"
+          ]
+      },
+      "title": {
+          "$id": "#/properties/title",
+          "type": "string",
+          "title": "The title schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "moominmug"
+          ]
+      },
+      "description": {
+          "$id": "#/properties/description",
+          "type": "string",
+          "title": "The description schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "this is very nice moominmug"
+          ]
+      },
+      "category": {
+          "$id": "#/properties/category",
+          "type": "string",
+          "title": "The category schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "mugs"
+          ]
+      },
+      "location": {
+          "$id": "#/properties/location",
+          "type": "object",
+          "title": "The location schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": {},
+          "examples": [
+              {
+                  "zipCode": 90520,
+                  "city": "Oulu"
+              }
+          ],
+          "required": [
+              "zipCode",
+              "city"
+          ],
+          "properties": {
+              "zipCode": {
+                  "$id": "#/properties/location/properties/zipCode",
+                  "type": "integer",
+                  "title": "The zipCode schema",
+                  "description": "An explanation about the purpose of this instance.",
+                  "default": 0,
+                  "examples": [
+                      90520
+                  ]
+              },
+              "city": {
+                  "$id": "#/properties/location/properties/city",
+                  "type": "string",
+                  "title": "The city schema",
+                  "description": "An explanation about the purpose of this instance.",
+                  "default": "",
+                  "examples": [
+                      "Oulu"
+                  ]
+              }
+          },
+          "additionalProperties": false
+      },
+      "imageNames": {
+          "$id": "#/properties/imageNames",
+          "type": "array",
+          "title": "The imageNames schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": [],
+          "examples": [
+              [
+                  "picture1.jpg",
+                  "picture2.jpg"
+              ]
+          ]
+      },
+      "askingPrice": {
+          "$id": "#/properties/askingPrice",
+          "type": "number",
+          "title": "The askingPrice schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": 0.0,
+          "examples": [
+              35.4
+          ]
+      },
+      "deliveryType": {
+          "$id": "#/properties/deliveryType",
+          "type": "object",
+          "title": "The deliveryType schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": {},
+          "examples": [
+              {
+                  "shipping": true,
+                  "pickup": false
+              }
+          ],
+          "required": [
+              "shipping",
+              "pickup"
+          ],
+          "properties": {
+              "shipping": {
+                  "$id": "#/properties/deliveryType/properties/shipping",
+                  "type": "boolean",
+                  "title": "The shipping schema",
+                  "description": "An explanation about the purpose of this instance.",
+                  "default": false,
+                  "examples": [
+                      true
+                  ]
+              },
+              "pickup": {
+                  "$id": "#/properties/deliveryType/properties/pickup",
+                  "type": "boolean",
+                  "title": "The pickup schema",
+                  "description": "An explanation about the purpose of this instance.",
+                  "default": false,
+                  "examples": [
+                      false
+                  ]
+              }
+          },
+          "additionalProperties": false
+      },
+      "sellerId": {
+          "$id": "#/properties/sellerId",
+          "type": "string",
+          "title": "The sellerId schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "123e4567-e89b-12d3-a456-426614174000"
+          ]
+      }
+  },
+  "additionalProperties": false
+}
