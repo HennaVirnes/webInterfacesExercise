@@ -13,43 +13,18 @@ const users = require('./users.json').users ;
 
 app.use(bodyParser.json());
 
-
-function validateUsernamePasswordMW (req, res, next) {
-  const ajv = new Ajv();
-  const validate = ajv.compile(login);
-  const valid = validate(req.body);
-  if (valid == true) {
-    next();
-  }
-  else {
-    res.status(400);
-    res.send("some fields are missing OR incorrect");
-  }
-}
-
-function validateRegistering (req, res, next) {
-  const ajv = new Ajv();
-  const validate = ajv.compile(registerUserSchema);
-  const valid = validate(req.body);
-  if (valid == true) {
-    next();
-  }
-  else {
-    res.status(400);
-    res.send("some fields are missing OR incorrect");
-  }
-}
-
-function validateItem (req, res, next) {
-  const ajv = new Ajv();
-  const validate = ajv.compile(itemSchema);
-  const valid = validate(req.body);
-  if (valid == true) {
-    next();
-  }
-  else {
-    res.status(400);
-    res.send("not ok");
+function validateSchema( schemaName ) {
+  return function (req, res, next) {
+    const ajv = new Ajv();
+    const validate = ajv.compile(schemaName);
+    const valid = validate(req.body);
+    if (valid == true) {
+      next();
+    }
+    else {
+      res.status(400);
+      res.send("not ok");
+    }
   }
 }
 
@@ -58,7 +33,7 @@ app.get('/', (req, res) => {
 })
 
 //user registration with validating the req.body format
-app.post('/users/register', validateRegistering, (req, res) => {
+app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
   //check if username exists already
   if (users.find(e => e.username == req.body.username) > 0) {
     //yes --> reject
@@ -84,7 +59,7 @@ app.post('/users/register', validateRegistering, (req, res) => {
 })
 
 //user login with validating the req.body format
-app.post('/login', validateUsernamePasswordMW, (req, res) => {
+app.post('/login', validateSchema(login), (req, res) => {
 
   bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
     console.log(hash);
@@ -116,14 +91,14 @@ app.post('/login', validateUsernamePasswordMW, (req, res) => {
 })
 
 //create a new post
-app.post('/items/new', validateItem, (req, res) => {
+app.post('/items/new', validateSchema(itemSchema), (req, res) => {
   //user authentication???
   //create a new post to database
   res.send("ok, new post created");
 })
 
 //modify post
-app.put('/items/:itemid', validateItem, (req, res) => {
+app.put('/items/:itemid', validateSchema(itemSchema), (req, res) => {
   //user authentication???
   //check if there is a post for the id
   // no --> error, no such a post
