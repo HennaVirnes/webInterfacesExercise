@@ -2,42 +2,86 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "$id": "http://example.com/example.json",
   "type": "object",
-  "title": "register user",
-  "description": "This schema is for registering a new user",
+  "title": "The root schema",
+  "description": "The root schema comprises the entire JSON document.",
   "default": {},
   "examples": [
       {
-          "username": "34567",
-          "password": "dslkafjlj"
+          "username": "titityy",
+          "password": "pa$$word",
+          "lName": "John",
+          "phoneNumber": "040 4534455",
+          "email": "qwerty@asdfg.fi",
+          "fName": "Doe"
       }
   ],
   "required": [
       "username",
-      "password"
+      "password",
+      "lName",
+      "phoneNumber",
+      "email",
+      "fName"
   ],
   "properties": {
       "username": {
           "$id": "#/properties/username",
           "type": "string",
           "title": "The username schema",
-          "description": "username for the new user",
+          "description": "An explanation about the purpose of this instance.",
           "default": "",
-          "minLength": 2,
-          "maxLength": 20,
           "examples": [
-              "34567"
+              "titityy"
           ]
       },
       "password": {
           "$id": "#/properties/password",
           "type": "string",
           "title": "The password schema",
-          "description": "password for the new user",
+          "description": "An explanation about the purpose of this instance.",
           "default": "",
-          "minLength": 5,
-          "maxLength": 50,
           "examples": [
-              "dslkafjlj"
+              "pa$$word"
+          ]
+      },
+      "lName": {
+          "$id": "#/properties/lName",
+          "type": "string",
+          "title": "The lName schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "John"
+          ]
+      },
+      "phoneNumber": {
+          "$id": "#/properties/phoneNumber",
+          "type": "string",
+          "title": "The phoneNumber schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "040 4534455"
+          ]
+      },
+      "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "title": "The email schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "qwerty@asdfg.fi"
+          ]
+      },
+      "fName": {
+          "$id": "#/properties/fName",
+          "type": "string",
+          "title": "The fName schema",
+          "description": "An explanation about the purpose of this instance.",
+          "default": "",
+          "examples": [
+              "Doe"
           ]
       }
   },
