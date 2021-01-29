@@ -5,12 +5,12 @@
     {
       "username": "johndoe",
       "password": "$2b$10$FNY3VFH7jJivGcKL.H89i.5.R7GUHuJjwwEvLc/snqF/Pv5yEy84y",
-      "id": 1
+      "id": "123e4567-e89b-12d3-a456-426614174000"
     },
     {
       "username": "foobar",
       "password": "$2b$10$FNY3VFH7jJivGcKL.H89i.5.R7GUHuJjwwEvLc/snqF/Pv5yEy84y",
-      "id": 2
+      "id": "123e4567-e89b-12d3-a456-426614174001"
     }
   ]
 }

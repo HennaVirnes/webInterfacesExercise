@@ -1,0 +1,45 @@
+{
+  "items": 
+  [
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "title": "moominmug",
+      "description": "this is very nice moominmug",
+      "category": "mugs",
+      "location": {
+          "zipCode": 90520,
+          "city": "Oulu"
+      },
+      "imageNames": [
+          "picture1.jpg",
+          "picture2.jpg"
+      ],
+      "askingPrice": 35.4,
+      "deliveryType": {
+          "shipping": true,
+          "pickup": false
+      },
+      "sellerId": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "title": "t-shirt",
+      "description": "this is very nice t-shirt",
+      "category": "clothes",
+      "location": {
+          "zipCode": 92140,
+          "city": "Pattijoki"
+      },
+      "imageNames": [
+          "picture1.jpg",
+          "picture2.jpg"
+      ],
+      "askingPrice": 10,
+      "deliveryType": {
+          "shipping": true,
+          "pickup": true
+      },
+      "sellerId": "123e4567-e89b-12d3-a456-426614174001"
+    }
+  ]
+}

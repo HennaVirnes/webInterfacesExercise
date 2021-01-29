@@ -9,9 +9,54 @@ const itemSchema = require('./schemas/newItem.json');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const uuid = require('uuid'); 
-const users = require('./users.json').users ;
+const users = require('./db/users.json').users ;
+const items = require('./db/items.json').items ;
+const passport = require('passport') ;
+const BasicStrategy = require('passport-http').BasicStrategy ;
+const jwt = require('jsonwebtoken');
+const JwtStrategy = require('passport-jwt').Strategy,
+      ExtractJwt = require('passport-jwt').ExtractJwt;
+const jwtKey = require('./jwt-key.json').key;
+const { userInfo } = require('os');
 
 app.use(bodyParser.json());
+
+//http basic passport
+passport.use(new BasicStrategy(
+  function(username, password, done) {
+    const userInfo = users.find(user => user.username == username) ;
+    if (userInfo == null)
+    {
+      console.log("username not found") ;
+      return done (null, false) ;
+    }
+    else {
+      if (bcrypt.compareSync(password, userInfo.password) == true ) 
+      {
+        return done (null, userInfo) ;
+      }
+      console.log("unauthorized, username and password are not matching") ;
+      return done(null, false) ;
+    }
+  }
+));
+
+
+//jwt passport
+let opts = {}
+opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+opts.secretOrKey = jwtKey;
+
+passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
+  const now = Date.now() / 1000;
+  if (jwtKey_payload.exp > now) {
+    done(null, jwt_payload.user) ;
+  }
+  else {
+    done(null, false)
+  }
+}));
+
 
 function validateSchema( schemaName ) {
   return function (req, res, next) {
@@ -53,41 +98,66 @@ app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
         id: uuid.v4()
       }
       users.push(newuser);
-      res.send('ok');
+      res.status(200);
+      res.send('new user created');
     })
   }
 })
 
-//user login with validating the req.body format
-app.post('/login', validateSchema(login), (req, res) => {
+// //user login with validating the req.body format
+// app.post('/login', validateSchema(login), passport.authenticate('basic', {session: false}), (req, res) => {
+//   //check if the username can be found from database
+//   const dbUser = users.find(e => e.username == req.body.username) ;
+//   if (dbUser == null ) {
+//     //no --> error, no such user
+//     res.status(406) ;
+//     res.send("there is no user matching the username");
+//   }
+//   //yes --> check if the username and password are a mach
+//   else {
+//     bcrypt.compare(req.body.password, dbUser.password, function (err, result) {
+//       //yes --> succesfull login
+//       if (result == true) {
+//         const body = {
+//           id: "1234",
+//           username: "username"
+//         };
+//         const payload = {
+//           user: body 
+//         };
 
-  bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
-    console.log(hash);
-    });
+//         const options = {
+//           expiresIn: '1d'
+//         }
+//         const token = jwt.sign(payload, jwtKey, options);
+//         res.status(200) ;
+//         return res.json({token})
+//       }
+//       //no --> error, wrong password
+//       else {
+//         res.status(401) ;
+//         res.send("unauthorized, username and password are not matching") ;
+//       }
+//     })
+//   }    
+// })
 
-  //check if the username can be found from database
-  const dbUser = users.find(e => e.username == req.body.username) ;
-  console.log(dbUser);
-  if (dbUser == null ) {
-    //no --> error, no such user
-    res.status(406) ;
-    res.send("there is no user matching the username");
+//user login with validating the req.body format and using basic auth for confirming username&password
+app.post('/login', validateSchema(login), passport.authenticate('basic', {session: false}), (req, res) => {
+  console.log(req.user);
+  const body = {
+    id: req.user.id,
+    username: req.user.username
+  };
+  const payload = {
+    user: body 
+  };
+  const options = {
+    expiresIn: '1d'
   }
-  //yes --> check if the username and password are a mach
-  else {
-    bcrypt.compare(req.body.password, dbUser.password, function (err, result) {
-      //yes --> succesfull login
-      if (result == true) {
-        res.status(200) ;
-        res.send("yaaaay, succesfull login!");
-      }
-      //no --> error, wrong password
-      else {
-        res.status(401) ;
-        res.send("unauthorized, username and password are not matching") ;
-      }
-    })
-  }    
+  const token = jwt.sign(payload, jwtKey, options);
+  res.status(200) ;
+  return res.json({token})   
 })
 
 //create a new post
