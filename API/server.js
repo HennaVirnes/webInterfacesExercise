@@ -144,7 +144,6 @@ app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
 
 //user login with validating the req.body format and using basic auth for confirming username&password
 app.post('/login', validateSchema(login), passport.authenticate('basic', {session: false}), (req, res) => {
-  console.log(req.user);
   const body = {
     id: req.user.id,
     username: req.user.username
