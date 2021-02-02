@@ -7,7 +7,6 @@
   "default": {},
   "examples": [
       {
-          "id": "123e4567-e89b-12d3-a456-426614174000",
           "title": "moominmug",
           "description": "this is very nice moominmug",
           "category": "mugs",
@@ -23,32 +22,19 @@
           "deliveryType": {
               "shipping": true,
               "pickup": false
-          },
-          "sellerId": "123e4567-e89b-12d3-a456-426614174000"
+          }
       }
   ],
   "required": [
-      "id",
       "title",
       "description",
       "category",
       "location",
       "imageNames",
       "askingPrice",
-      "deliveryType",
-      "sellerId"
+      "deliveryType"
   ],
   "properties": {
-      "id": {
-          "$id": "#/properties/id",
-          "type": "string",
-          "title": "The id schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "123e4567-e89b-12d3-a456-426614174000"
-          ]
-      },
       "title": {
           "$id": "#/properties/title",
           "type": "string",
@@ -181,16 +167,6 @@
               }
           },
           "additionalProperties": false
-      },
-      "sellerId": {
-          "$id": "#/properties/sellerId",
-          "type": "string",
-          "title": "The sellerId schema",
-          "description": "An explanation about the purpose of this instance.",
-          "default": "",
-          "examples": [
-              "123e4567-e89b-12d3-a456-426614174000"
-          ]
       }
   },
   "additionalProperties": false

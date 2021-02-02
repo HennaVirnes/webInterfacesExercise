@@ -2,7 +2,8 @@ const chai = require('chai');
 const expect = require('chai').expect ;
 chai.use(require('chai-http'));
 const server = require('../server');
-const apiAddress = "http://localhost:3000"
+const apiAddress = "http://localhost:3000" ;
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiZDIzYTYzOTUtYWViZC00NTlmLThjZWYtODcxMWFmMTEyMzRjIiwidXNlcm5hbWUiOiJtaWtrb21hbGxpa2FzIn0sImlhdCI6MTYxMjI5NjY5OCwiZXhwIjoxNjEyMzgzMDk4fQ.dCFXweXYv7MSxgsDzar2km3t9kqbcYzJ5qqgUaUNUbQ";
 
 describe("demonstrating of tests", function() {
   before(function() {
@@ -410,9 +411,11 @@ describe("demonstrating of tests", function() {
     it('Should return status 200 with correct request', async function() {
       await chai.request( apiAddress)
       .post('/login')
-      .set("Authorization", "basic " + new Buffer("mikkomallikas:pa$$word").toString("base64"))
+      .set('Authorization', 'Basic ' + Buffer.from("mikkomallikas" + ':' + "pa$$word").toString('base64'))
       .then(response => {
         expect(response.status).to.equal(200);
+        expect(response.body).to.be.a('object');
+        expect(response.body).to.have.property('token');
       })
       .catch(error => {
         throw error ;
@@ -421,7 +424,7 @@ describe("demonstrating of tests", function() {
     it('Should reject request if username is missing', async function() {
       await chai.request( apiAddress)
       .post('/login')
-      .set("Authorization", "basic " + new Buffer(":pa$$word").toString("base64"))
+      .set('Authorization', 'Basic ' + Buffer.from(':' + "pa$$word").toString('base64'))
       .then(response => {
         expect(response.status).to.equal(401);
       })
@@ -432,7 +435,7 @@ describe("demonstrating of tests", function() {
     it('Should reject request if password is missing', async function() {
       await chai.request( apiAddress)
       .post('/login')
-      .set("Authorization", "basic " + new Buffer("mikkomallikas:").toString("base64"))
+      .set('Authorization', 'Basic ' + Buffer.from("mikkomallikas" + ':').toString('base64'))
       .then(response => {
         expect(response.status).to.equal(401);
       })
@@ -480,7 +483,7 @@ describe("demonstrating of tests", function() {
     it('Should reject request if there is no user with the given username', async function() {
       await chai.request( apiAddress)
       .post('/login')
-      .set("Authorization", "basic " + new Buffer("mikkomallikasjkjk:pa$$word").toString("base64"))
+      .set('Authorization', 'Basic ' + Buffer.from("mikkomallikasfff" + ':' + "pa$$word").toString('base64'))
       .then(response => {
         expect(response.status).to.equal(401);
       })
@@ -491,7 +494,7 @@ describe("demonstrating of tests", function() {
     it('Should reject request if the password is wrong', async function() {
       await chai.request( apiAddress)
       .post('/login')
-      .set("Authorization", "basic " + new Buffer("mikkomallikas:pa$$worde").toString("base64"))
+      .set('Authorization', 'Basic ' + Buffer.from("mikkomallikas" + ':' + "pa$$wford").toString('base64'))
       .then(response => {
         expect(response.status).to.equal(401);
       })
@@ -499,6 +502,90 @@ describe("demonstrating of tests", function() {
         throw error ;
       })
     })
+  })
+  describe('testing route /items/new', function() {
+    it('Should return status 200 with correct request', async function() {
+      await chai.request( apiAddress)
+      .post('/items/new')
+      .set('Authorization', 'Bearer ' + token)
+      .send({          
+        title: "ps4 controller",
+        description: "cool controller, color gold",
+        category: "gaming",
+        location: {
+          zipCode: 92240,
+          city: "Lasikangas"
+        },
+        imageNames: ["controller1.png", "controller2.png"],
+        askingPrice: 10.0,
+        deliveryType: {
+          shipping: true,
+          pickup: false
+        }
+      })
+      .then(response => {
+        expect(response.status).to.equal(200);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+    it('Should reject request if there are additional fields in body', async function() {
+      await chai.request( apiAddress)
+      .post('/items/new')
+      .set('Authorization', 'Bearer ' + token)
+      .send({          
+        extraField: "EXTRA EXTRA!!!!",
+        title: "ps4 controller",
+        description: "cool controller, color gold",
+        category: "gaming",
+        location: {
+          zipCode: 92240,
+          city: "Lasikangas"
+        },
+        imageNames: ["controller1.png", "controller2.png"],
+        askingPrice: 10.0,
+        deliveryType: {
+          shipping: true,
+          pickup: false
+        }
+      })
+      .then(response => {
+        expect(response.status).to.equal(400);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+    it('Should reject request if token is wrong', async function() {
+      await chai.request( apiAddress)
+      .post('/items/new')
+      .set('Authorization', 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiYTQ5ZDJjNGQtYzM2OC00NDBhLWJlNjMtZmM0M2NkODg0NTA2IiwidXNlcm5hbWUiOiJtaWtrb21hbGxpa2FzcyJ9LCJpYXQiOjE2MTIyOTk3MzEsImV4cCI6MTYxMjM4NjEzMX0.3blHfW66oYtBB6dic6ENQTCDRlq-SfzKrVcOlEUh7Iw")
+      .send({          
+        title: "ps4 controller",
+        description: "cool controller, color gold",
+        category: "gaming",
+        location: {
+          zipCode: 92240,
+          city: "Lasikangas"
+        },
+        imageNames: ["controller1.png", "controller2.png"],
+        askingPrice: 10.0,
+        deliveryType: {
+          shipping: true,
+          pickup: false
+        }
+      })
+      .then(response => {
+        expect(response.status).to.equal(401);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+  })
+  describe('testing route /????', function() {
+    it('Should return status 200 with correct request', async function() {})
   })
 }) 
 

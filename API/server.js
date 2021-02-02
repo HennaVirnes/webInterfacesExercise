@@ -17,7 +17,6 @@ const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt;
 const jwtKey = require('./jwt-key.json').key;
-const { use } = require('chai');
 
 app.use(bodyParser.json());
 
@@ -49,8 +48,14 @@ opts.secretOrKey = jwtKey;
 
 passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
   const now = Date.now() / 1000;
-  if (jwtKey_payload.exp > now) {
-    done(null, jwt_payload.user) ;
+  if (jwt_payload.exp > now) {
+    const userInfo = users.find(user => user.username == jwt_payload.user.username) ;
+    if (userInfo != null){
+      done(null, userInfo) ;
+    }
+    else {
+      done(null, false)
+    }
   }
   else {
     done(null, false)
@@ -160,9 +165,28 @@ app.post('/login', passport.authenticate('basic', {session: false}), (req, res) 
 })
 
 //create a new post
-app.post('/items/new', validateSchema(itemSchema), (req, res) => {
-  //user authentication???
+app.post('/items/new', validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
   //create a new post to database
+  const newitem = {
+    id: uuid.v4(),
+    title: req.body.title,
+    description: req.body.description,
+    category: req.body.category,
+    location: {
+      zipCode: req.body.location.zipCode,
+      city: req.body.location.city
+    },
+    imageNames: req.body.imageNames,
+    askingPrice: req.body.askingPrice,
+    deliveryType: {
+      shipping: req.body.deliveryType.shipping,
+      pickup: req.body.deliveryType.pickup
+    },
+    sellerId: req.user.id
+  }
+  
+  items.push(newitem);
+  res.status(200);
   res.send("ok, new post created");
 })
 
