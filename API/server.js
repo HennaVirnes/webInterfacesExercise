@@ -17,7 +17,7 @@ const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt;
 const jwtKey = require('./jwt-key.json').key;
-const { userInfo } = require('os');
+const { use } = require('chai');
 
 app.use(bodyParser.json());
 
@@ -80,7 +80,7 @@ app.get('/', (req, res) => {
 //user registration with validating the req.body format
 app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
   //check if username exists already
-  if (users.find(e => e.username == req.body.username) > 0) {
+  if (users.find(e => e.username == req.body.username) != null) {
     //yes --> reject
     res.status(406) ;
     res.send("user already exists");
@@ -143,7 +143,7 @@ app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
 // })
 
 //user login with validating the req.body format and using basic auth for confirming username&password
-app.post('/login', validateSchema(login), passport.authenticate('basic', {session: false}), (req, res) => {
+app.post('/login', passport.authenticate('basic', {session: false}), (req, res) => {
   const body = {
     id: req.user.id,
     username: req.user.username

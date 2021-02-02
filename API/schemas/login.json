@@ -22,8 +22,6 @@
           "title": "The username schema",
           "description": "username for the new user",
           "default": "",
-          "minLength": 2,
-          "maxLength": 20,
           "examples": [
               "34567"
           ]
@@ -34,8 +32,6 @@
           "title": "The password schema",
           "description": "password for the new user",
           "default": "",
-          "minLength": 5,
-          "maxLength": 50,
           "examples": [
               "dslkafjlj"
           ]
