@@ -5,12 +5,20 @@
     {
       "username": "johndoe",
       "password": "$2b$10$FNY3VFH7jJivGcKL.H89i.5.R7GUHuJjwwEvLc/snqF/Pv5yEy84y",
-      "id": "123e4567-e89b-12d3-a456-426614174000"
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "lName": "John",
+      "phoneNumber": "040 4534455",
+      "email": "qwerty@asdfg.fi",
+      "fName": "Doe"
     },
     {
       "username": "foobar",
       "password": "$2b$10$FNY3VFH7jJivGcKL.H89i.5.R7GUHuJjwwEvLc/snqF/Pv5yEy84y",
-      "id": "123e4567-e89b-12d3-a456-426614174001"
+      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "lName": "Foo",
+      "phoneNumber": "040 4534455",
+      "email": "foobar@asdfg.fi",
+      "fName": "Bar"
     }
   ]
 }

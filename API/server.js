@@ -13,6 +13,7 @@ const users = require('./db/users.json').users ;
 const items = require('./db/items.json').items ;
 const multer = require('multer') ;
 const multerUpload = multer({dest: 'uploads'}) ;
+var fs = require('fs');
 const passport = require('passport') ;
 const BasicStrategy = require('passport-http').BasicStrategy ;
 const jwt = require('jsonwebtoken');
@@ -181,7 +182,7 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
     }
   }
    //create a new post to database
-  const newitem = {
+  const newItem = {
     id: uuid.v4(),
     title: req.body.title,
     description: req.body.description,
@@ -198,7 +199,8 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
     },
     sellerId: req.user.id
   }
-  items.push(newitem);
+  console.log(newItem)
+  items.push(newItem);
   res.status(200);
   res.send("ok, new post created");
 })
@@ -207,28 +209,35 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
 app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
   //check if there is a post for the id
   itemInfo = doesItemExist(req.params.itemid) ;
-  // yes --> modify the existing post
-  if (itemInfo != null) {
-    for (var i = 0; i<items.length; i++) {
-      if (items[i].id == req.params.itemid) {
-        items[i].title = req.body.title ;
-        items[i].description = req.body.description;
-        items[i].category = req.body.category;
-        items[i].location = {
-          zipCode: req.body.location.zipCode,
-          city: req.body.location.city
-        };
-        items[i].imageNames = req.body.imageNames;
-        items[i].askingPrice = req.body.askingPrice;
-        items[i].deliveryType = {
-          shipping: req.body.deliveryType.shipping,
-          pickup: req.body.deliveryType.pickup
-        };
-        break;
-      }
+  if (itemInfo != null){
+    //check if the user has right to modify the post
+    if(req.user.id != itemInfo.sellerId){
+      res.status(401) ;
+      res.send ("user doesn't have the right to modify this post") ;
     }
-    res.status(200);
-    res.send("ok, post modified");
+    else {
+    // yes --> modify the existing post
+      for (var i = 0; i<items.length; i++) {
+        if (items[i].id == req.params.itemid) {
+          items[i].title = req.body.title ;
+          items[i].description = req.body.description;
+          items[i].category = req.body.category;
+          items[i].location = {
+            zipCode: req.body.location.zipCode,
+            city: req.body.location.city
+          };
+          items[i].imageNames = req.body.imageNames;
+          items[i].askingPrice = req.body.askingPrice;
+          items[i].deliveryType = {
+            shipping: req.body.deliveryType.shipping,
+            pickup: req.body.deliveryType.pickup
+          };
+          break;
+        }
+      }
+      res.status(200);
+      res.send("ok, post modified");
+    }
   }
   // no --> error, no such post with the id
   else {
@@ -238,12 +247,37 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
 })
 
 //delete a post
-app.delete('/items/:itemid', (req, res) => {
-  //user authentication???
+app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (req, res) => {
   //check if there is a post for the id
-  // no --> error, no such a post
-  // yes --> delete it
-  res.send("ok, post deleted");
+  itemInfo = doesItemExist(req.params.itemid) ;
+  if (itemInfo != null){
+    //check if the user has right to delete the post
+    if(req.user.id != itemInfo.sellerId){
+      //no right to delete the post
+      res.status(401) ;
+      res.send ("user doesn't have the right to delete this post") ;
+    }
+    else {
+    // yes --> delete it
+      //check whether there are any pictures and delete those
+      for (var i = 0; i<itemInfo.imageNames.length; i++) {
+        if(fs.existsSync('uploads/'+itemInfo.imageNames[i])) {
+          fs.unlink('uploads/'+itemInfo.imageNames[i], (err) =>{
+            if (err) throw err;
+          });
+        }
+      }
+      const index = (items.findIndex(item => item.id == req.params.itemid));
+      items.splice(index, 1); 
+      res.status(200);
+      res.send("ok, post deleted");
+    }
+  }
+  // no --> error, no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
 })
 
 //get posts
