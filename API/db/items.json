@@ -2,7 +2,7 @@
   "items": 
   [
     {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "id": "123e4567-e89b-12d3-a456-426614174008",
       "title": "moominmug",
       "description": "this is very nice moominmug",
       "category": "mugs",
@@ -22,7 +22,7 @@
       "sellerId": "123e4567-e89b-12d3-a456-426614174000"
     },
     {
-      "id": "123e4567-e89b-12d3-a456-426614174001",
+      "id": "123e4567-e89b-12d3-a456-426614174005",
       "title": "t-shirt",
       "description": "this is very nice t-shirt",
       "category": "clothes",

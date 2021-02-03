@@ -3,7 +3,8 @@ const expect = require('chai').expect ;
 chai.use(require('chai-http'));
 const server = require('../server');
 const apiAddress = "http://localhost:3000" ;
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiZDIzYTYzOTUtYWViZC00NTlmLThjZWYtODcxMWFmMTEyMzRjIiwidXNlcm5hbWUiOiJtaWtrb21hbGxpa2FzIn0sImlhdCI6MTYxMjI5NjY5OCwiZXhwIjoxNjEyMzgzMDk4fQ.dCFXweXYv7MSxgsDzar2km3t9kqbcYzJ5qqgUaUNUbQ";
+let token = "";
+const itemId = "123e4567-e89b-12d3-a456-426614174008";
 
 describe("demonstrating of tests", function() {
   before(function() {
@@ -416,6 +417,7 @@ describe("demonstrating of tests", function() {
         expect(response.status).to.equal(200);
         expect(response.body).to.be.a('object');
         expect(response.body).to.have.property('token');
+        token = response.body.token ;
       })
       .catch(error => {
         throw error ;
@@ -508,6 +510,81 @@ describe("demonstrating of tests", function() {
       await chai.request( apiAddress)
       .post('/items/new')
       .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .field({title: "ps4 controller",
+              description: "cool controller, color gold",
+              category: "gaming",
+              zipCode: 92240,
+              city: "Lasikangas",
+              imageNames: ["controller1.png", "controller2.png"],
+              askingPrice: 10.0,
+              shipping: true,
+              pickup: false })
+      .attach('photos', './test/testimage.png')
+      .attach('photos', './test/testimage2.png')
+      .then(response => {
+        expect(response.status).to.equal(200);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+    it('Should reject request if there are additional fields in body', async function() {
+      await chai.request( apiAddress)
+      .post('/items/new')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .field({title: "ps4 controller",
+              description: "cool controller, color gold",
+              category: "gaming",
+              zipCode: 92240,
+              city: "Lasikangas",
+              imageNames: ["controller1.png", "controller2.png"],
+              askingPrice: 10.0,
+              shipping: true,
+              pickup: false,
+              extra: "this is some extra thingy!" })
+      .attach('photos', './test/testimage.png')
+      .attach('photos', './test/testimage2.png')
+      .then(response => {
+        expect(response.status).to.equal(200);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+    it('Should reject request if token is wrong', async function() {
+      await chai.request( apiAddress)
+      .post('/items/new')
+      .set('Authorization', 'Bearer ' + "thisISMyFakeToken")
+      .set('Content-Type', 'application/x-www-form-urlencoded')
+      .field({title: "ps4 controller",
+              description: "cool controller, color gold",
+              category: "gaming",
+              zipCode: 92240,
+              city: "Lasikangas",
+              imageNames: ["controller1.png", "controller2.png"],
+              askingPrice: 10.0,
+              shipping: true,
+              pickup: false })
+      .attach('photos', './test/testimage.png')
+      .attach('photos', './test/testimage2.png')
+      .then(response => {
+        expect(response.status).to.equal(401);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+  })
+
+
+  
+  describe('testing route /items/:itemid', function() {
+    it('Should return status 200 with correct request', async function() {
+      await chai.request( apiAddress)
+      .put('/items/' + itemId)
+      .set('Authorization', 'Bearer ' + token)
       .send({          
         title: "ps4 controller",
         description: "cool controller, color gold",
@@ -530,12 +607,11 @@ describe("demonstrating of tests", function() {
         throw error ;
       })
     })
-    it('Should reject request if there are additional fields in body', async function() {
+    it('Should reject request if the id params is wrong', async function() {
       await chai.request( apiAddress)
-      .post('/items/new')
+      .put('/items/' + "123e4567-e89b-12d3-a456-42661417400")
       .set('Authorization', 'Bearer ' + token)
       .send({          
-        extraField: "EXTRA EXTRA!!!!",
         title: "ps4 controller",
         description: "cool controller, color gold",
         category: "gaming",
@@ -544,6 +620,33 @@ describe("demonstrating of tests", function() {
           city: "Lasikangas"
         },
         imageNames: ["controller1.png", "controller2.png"],
+        askingPrice: 10.0,
+        deliveryType: {
+          shipping: true,
+          pickup: false
+        }
+      })
+      .then(response => {
+        expect(response.status).to.equal(406);
+      })
+      .catch(error => {
+        throw error ;
+      })
+    })
+    it('Should reject request if there are extra inputs', async function() {
+      await chai.request( apiAddress)
+      .put('/items/' + itemId)
+      .set('Authorization', 'Bearer ' + token)
+      .send({          
+        title: "ps4 controller",
+        description: "cool controller, color gold",
+        category: "gaming",
+        location: {
+          zipCode: 92240,
+          city: "Lasikangas"
+        },
+        imageNames: ["controller1.png", "controller2.png"],
+        extra: "this is very special extra field that shouldn't be here",
         askingPrice: 10.0,
         deliveryType: {
           shipping: true,
@@ -552,32 +655,6 @@ describe("demonstrating of tests", function() {
       })
       .then(response => {
         expect(response.status).to.equal(400);
-      })
-      .catch(error => {
-        throw error ;
-      })
-    })
-    it('Should reject request if token is wrong', async function() {
-      await chai.request( apiAddress)
-      .post('/items/new')
-      .set('Authorization', 'Bearer ' + "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiYTQ5ZDJjNGQtYzM2OC00NDBhLWJlNjMtZmM0M2NkODg0NTA2IiwidXNlcm5hbWUiOiJtaWtrb21hbGxpa2FzcyJ9LCJpYXQiOjE2MTIyOTk3MzEsImV4cCI6MTYxMjM4NjEzMX0.3blHfW66oYtBB6dic6ENQTCDRlq-SfzKrVcOlEUh7Iw")
-      .send({          
-        title: "ps4 controller",
-        description: "cool controller, color gold",
-        category: "gaming",
-        location: {
-          zipCode: 92240,
-          city: "Lasikangas"
-        },
-        imageNames: ["controller1.png", "controller2.png"],
-        askingPrice: 10.0,
-        deliveryType: {
-          shipping: true,
-          pickup: false
-        }
-      })
-      .then(response => {
-        expect(response.status).to.equal(401);
       })
       .catch(error => {
         throw error ;

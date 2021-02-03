@@ -11,6 +11,8 @@ const saltRounds = 10;
 const uuid = require('uuid'); 
 const users = require('./db/users.json').users ;
 const items = require('./db/items.json').items ;
+const multer = require('multer') ;
+const multerUpload = multer({dest: 'uploads'}) ;
 const passport = require('passport') ;
 const BasicStrategy = require('passport-http').BasicStrategy ;
 const jwt = require('jsonwebtoken');
@@ -76,6 +78,11 @@ function validateSchema( schemaName ) {
       res.send("not ok");
     }
   }
+}
+
+function doesItemExist(id) {;
+  const itemInfo = items.find(item => item.id == id) ;
+  return itemInfo ;  
 }
 
 app.get('/', (req, res) => {
@@ -165,38 +172,69 @@ app.post('/login', passport.authenticate('basic', {session: false}), (req, res) 
 })
 
 //create a new post
-app.post('/items/new', validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
-  //create a new post to database
+app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4),  (req, res) => {
+  //get the image names
+  let imgNames = [];
+  if(req.files != null ){
+    for (var i = 0; i < req.files.length; i ++) {
+      imgNames.push(req.files[i].filename);
+    }
+  }
+   //create a new post to database
   const newitem = {
     id: uuid.v4(),
     title: req.body.title,
     description: req.body.description,
     category: req.body.category,
     location: {
-      zipCode: req.body.location.zipCode,
-      city: req.body.location.city
+      zipCode: req.body.zipCode,
+      city: req.body.city
     },
-    imageNames: req.body.imageNames,
+    imageNames: imgNames,
     askingPrice: req.body.askingPrice,
     deliveryType: {
-      shipping: req.body.deliveryType.shipping,
-      pickup: req.body.deliveryType.pickup
+      shipping: req.body.shipping,
+      pickup: req.body.pickup
     },
     sellerId: req.user.id
   }
-  
   items.push(newitem);
   res.status(200);
   res.send("ok, new post created");
 })
 
 //modify post
-app.put('/items/:itemid', validateSchema(itemSchema), (req, res) => {
-  //user authentication???
+app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
   //check if there is a post for the id
-  // no --> error, no such a post
+  itemInfo = doesItemExist(req.params.itemid) ;
   // yes --> modify the existing post
-  res.send("ok, post modified");
+  if (itemInfo != null) {
+    for (var i = 0; i<items.length; i++) {
+      if (items[i].id == req.params.itemid) {
+        items[i].title = req.body.title ;
+        items[i].description = req.body.description;
+        items[i].category = req.body.category;
+        items[i].location = {
+          zipCode: req.body.location.zipCode,
+          city: req.body.location.city
+        };
+        items[i].imageNames = req.body.imageNames;
+        items[i].askingPrice = req.body.askingPrice;
+        items[i].deliveryType = {
+          shipping: req.body.deliveryType.shipping,
+          pickup: req.body.deliveryType.pickup
+        };
+        break;
+      }
+    }
+    res.status(200);
+    res.send("ok, post modified");
+  }
+  // no --> error, no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
 })
 
 //delete a post
@@ -209,6 +247,11 @@ app.delete('/items/:itemid', (req, res) => {
 })
 
 //get posts
+
+
+
+
+
 let serverInstance = null;
 
 module.exports = {
