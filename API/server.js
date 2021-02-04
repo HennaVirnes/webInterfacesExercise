@@ -173,19 +173,7 @@ app.post('/login', passport.authenticate('basic', {session: false}), (req, res) 
 })
 
 //create a new post
-app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4),  (req, res) => {
-  //get the image names
-  let imgNames = [];
-  if(req.files != null ){
-    for (var i = 0; i < req.files.length; i ++) {
-      let correctFormat = req.files[0].originalname.split('.').pop() ;
-      let newName = req.files[i].filename + '.' + correctFormat ;
-      fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
-        if (err) throw err;
-      });
-      imgNames.push(newName);
-    }
-  }
+app.post('/items',validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
    //create a new post to database
   const date = new Date();
   const newItem = {
@@ -197,7 +185,7 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
       zipCode: req.body.zipCode,
       city: req.body.city
     },
-    imageNames: imgNames,
+    imageNames: [],
     askingPrice: req.body.askingPrice,
     deliveryType: {
       shipping: req.body.shipping,
@@ -234,7 +222,6 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
             zipCode: req.body.location.zipCode,
             city: req.body.location.city
           };
-          items[i].imageNames = req.body.imageNames;
           items[i].askingPrice = req.body.askingPrice;
           items[i].deliveryType = {
             shipping: req.body.deliveryType.shipping,
@@ -244,6 +231,7 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
         }
       }
       res.status(200);
+      res.json({id:itemInfo.id}) ;
       res.send("ok, post modified");
     }
   }
@@ -289,8 +277,34 @@ app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (re
 })
 
 
-app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), (req, res) => {
+app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4), (req, res) => {
+  itemInfo = doesItemExist(req.params.itemid) ;
 
+  if (itemInfo != null) {
+    let imgNames = [];
+    for (var i = 0; i < req.files.length; i ++) {
+      let correctFormat = req.files[0].originalname.split('.').pop() ;
+      let newName = req.files[i].filename + '.' + correctFormat ;
+      fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
+        if (err) throw err;
+      });
+      imgNames.push(newName);
+    }
+    for (var i = 0; i<items.length; i++) {
+      if (items[i].id == req.params.itemid) {
+        items[i].imageNames = imgNames;
+        console.log(items[i]);
+      }
+      break;
+    }   
+    res.status(200);
+    res.send('ok, pictures uploaded') 
+  }
+  // no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
 })
 
 
