@@ -6,6 +6,7 @@ const Ajv = require('ajv').default;
 const registerUserSchema = require('./schemas/registerUser.json');
 const login = require('./schemas/login.json');
 const itemSchema = require('./schemas/newItem.json');
+const imagesToDelete = require('./schemas/imagesToDelete.json') ;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const uuid = require('uuid'); 
@@ -306,6 +307,37 @@ app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}
   }
 })
 
+app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete)/*, passport.authenticate('jwt', {session: false})*/, (req, res) => {
+  itemInfo = doesItemExist(req.params.itemid) ;
+
+  if (itemInfo != null) {
+    for (var i = 0; i<req.body.imageNames.length; i++) {
+      if(fs.existsSync('uploads/'+ req.body.imageNames[i])) {
+        fs.unlink('uploads/'+ req.body.imageNames[i], (err) =>{
+          if (err) throw err;
+        });
+      }
+    }
+    for (var i = 0; i<items.length; i++) {
+      if (items[i].id == req.params.itemid) {
+        for (var i = 0; i<req.body.imageNames.length; i++) {
+          const index = (itemInfo.imageNames.findIndex(name => name == req.body.imageNames[i]));
+          if (index != null) {
+            itemInfo.imageNames.splice(index, 1); 
+          }
+        }
+      }
+      break;
+    } 
+    res.status(200);
+    res.send("pictures deleted succesfully");
+  }
+  // no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
+})
 
 
 
