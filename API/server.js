@@ -13,7 +13,7 @@ const users = require('./db/users.json').users ;
 const items = require('./db/items.json').items ;
 const multer = require('multer') ;
 const multerUpload = multer({dest: 'uploads'}) ;
-var fs = require('fs');
+const fs = require('fs');
 const passport = require('passport') ;
 const BasicStrategy = require('passport-http').BasicStrategy ;
 const jwt = require('jsonwebtoken');
@@ -155,7 +155,7 @@ app.post('/users/register', validateSchema(registerUserSchema), (req, res) => {
 //   }    
 // })
 
-//user login with validating the req.body format and using basic auth for confirming username&password
+//user login using basic auth for confirming username&password and creating a token
 app.post('/login', passport.authenticate('basic', {session: false}), (req, res) => {
   const body = {
     id: req.user.id,
