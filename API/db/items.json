@@ -19,6 +19,7 @@
           "shipping": true,
           "pickup": false
       },
+      "created": "2021-02-04T12:35:18.192Z",
       "sellerId": "123e4567-e89b-12d3-a456-426614174000"
     },
     {
@@ -39,6 +40,7 @@
           "shipping": true,
           "pickup": true
       },
+      "created": "2021-02-01T12:35:18.192Z",
       "sellerId": "123e4567-e89b-12d3-a456-426614174001"
     }
   ]

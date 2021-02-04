@@ -182,6 +182,7 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
     }
   }
    //create a new post to database
+  const date = new Date();
   const newItem = {
     id: uuid.v4(),
     title: req.body.title,
@@ -197,6 +198,7 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
       shipping: req.body.shipping,
       pickup: req.body.pickup
     },
+    created: date,
     sellerId: req.user.id
   }
   console.log(newItem)
@@ -281,7 +283,112 @@ app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (re
 })
 
 //get posts
+// app.get('/items', (req, res) => {
+//   console.log(items);
+//   let searchFrom = items ;
+//   let searchedItems = []
+//   console.log(req.query) ;
+//   if (req.query.category != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].category == req.query.category) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log(searchFrom.category) ;
+//     console.log(req.query.category) ;
+//     console.log("category") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     searchFrom = searchedItems
+//   }
+//   if(req.query.city != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].city == req.query.city) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log("city") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     searchFrom = searchedItems
+//   }
+//   if(req.query.time != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].time >= req.query.time) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log("time") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     console.log("final after searc")
+//     res.json(searchedItems) ;
+//   }
+//   else {
+//     console.log("final without searc")
+//     res.json(items) ;
+//   }
+// })
+function searchItemsBy(searchFrom, searchName, operator, searchBy1, searchBy2 ) {
+  var searchResult = [] ;
+  var equal = function(first, second) {
+    return first == second ;
+  }
+  var bigger = function(first, second) {
+    return first >= second ;
+  }
+  var chosenOperator = equal ;
+ 
+  if (operator == 'bigger') {
+    chosenOperator = bigger ;
+  }
 
+  if (searchBy2 != null) {
+   searchResult = searchFrom.filter(item => chosenOperator(item[searchBy1][searchBy2].toLowerCase(), searchName.toLowerCase()) );
+  }
+  else {
+    searchResult = searchFrom.filter(item => chosenOperator(item[searchBy1].toLowerCase(), searchName.toLowerCase())) ;
+  }  
+  return searchResult
+  // for (var i = 0 ; i < searchFrom.length; i++) {
+  //   console.log(searchFrom[i][searchBy]);
+
+  //   if(searchFrom[i].searchBy == searchBy) {
+  //     searchedItems.push(searchFrom[i])
+  //   }
+  // }
+  // return searchedItems
+}
+
+//get items, also searching by category, city or time is possible
+app.get('/items', (req, res) => {
+    var listOfSearchedItems = [] ;
+    var itemListForSearching = items ;
+    var numberOfSearches = 0 ;
+    if (req.query.category != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.category,'equal', 'category') ;
+      numberOfSearches ++ ;
+    }
+    if(numberOfSearches != 0) {itemListForSearching = listOfSearchedItems}
+    if (req.query.city != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.city, 'equal', 'location', 'city') ;
+      numberOfSearches ++ ;
+    }
+    if(numberOfSearches != 0) {itemListForSearching = listOfSearchedItems}
+    if (req.query.time != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.time, 'bigger', 'created') ; 
+      numberOfSearches ++ ;
+    }
+    if (numberOfSearches > 0) {
+      res.json(listOfSearchedItems) ;
+    }
+    else {
+      res.json(items);
+    }
+  })
 
 
 
