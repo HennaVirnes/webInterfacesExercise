@@ -178,7 +178,12 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
   let imgNames = [];
   if(req.files != null ){
     for (var i = 0; i < req.files.length; i ++) {
-      imgNames.push(req.files[i].filename);
+      let correctFormat = req.files[0].originalname.split('.').pop() ;
+      let newName = req.files[i].filename + '.' + correctFormat ;
+      fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
+        if (err) throw err;
+      });
+      imgNames.push(newName);
     }
   }
    //create a new post to database
@@ -201,10 +206,11 @@ app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jw
     created: date,
     sellerId: req.user.id
   }
-  console.log(newItem)
+  console.log(newItem);
   items.push(newItem);
   res.status(200);
-  res.send("ok, new post created");
+  console.log(newItem.id);
+  res.json({id:newItem.id}) ;
 })
 
 //modify post
@@ -281,6 +287,14 @@ app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (re
     res.send("no item with the id");
   }
 })
+
+
+app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), (req, res) => {
+
+})
+
+
+
 
 //get posts
 // app.get('/items', (req, res) => {
