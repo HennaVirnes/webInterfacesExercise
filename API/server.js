@@ -182,14 +182,14 @@ app.post('/items',validateSchema(itemSchema), passport.authenticate('jwt', {sess
     description: req.body.description,
     category: req.body.category,
     location: {
-      zipCode: req.body.zipCode,
-      city: req.body.city
+      zipCode: req.body.location.zipCode,
+      city: req.body.location.city
     },
     imageNames: [],
     askingPrice: req.body.askingPrice,
     deliveryType: {
-      shipping: req.body.shipping,
-      pickup: req.body.pickup
+      shipping: req.body.deliveryType.shipping,
+      pickup: req.body.deliveryType.pickup
     },
     created: date,
     sellerId: req.user.id
@@ -232,7 +232,6 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
       }
       res.status(200);
       res.json({id:itemInfo.id}) ;
-      res.send("ok, post modified");
     }
   }
   // no --> error, no such post with the id
