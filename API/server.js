@@ -6,6 +6,7 @@ const Ajv = require('ajv').default;
 const registerUserSchema = require('./schemas/registerUser.json');
 const login = require('./schemas/login.json');
 const itemSchema = require('./schemas/newItem.json');
+const imagesToDelete = require('./schemas/imagesToDelete.json') ;
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const uuid = require('uuid'); 
@@ -173,36 +174,32 @@ app.post('/login', passport.authenticate('basic', {session: false}), (req, res) 
 })
 
 //create a new post
-app.post('/items/new', /*validateSchema(itemSchema),*/ passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4),  (req, res) => {
-  //get the image names
-  let imgNames = [];
-  if(req.files != null ){
-    for (var i = 0; i < req.files.length; i ++) {
-      imgNames.push(req.files[i].filename);
-    }
-  }
+app.post('/items',validateSchema(itemSchema), passport.authenticate('jwt', {session: false}), (req, res) => {
    //create a new post to database
+  const date = new Date();
   const newItem = {
     id: uuid.v4(),
     title: req.body.title,
     description: req.body.description,
     category: req.body.category,
     location: {
-      zipCode: req.body.zipCode,
-      city: req.body.city
+      zipCode: req.body.location.zipCode,
+      city: req.body.location.city
     },
-    imageNames: imgNames,
+    imageNames: [],
     askingPrice: req.body.askingPrice,
     deliveryType: {
-      shipping: req.body.shipping,
-      pickup: req.body.pickup
+      shipping: req.body.deliveryType.shipping,
+      pickup: req.body.deliveryType.pickup
     },
+    created: date,
     sellerId: req.user.id
   }
-  console.log(newItem)
+  console.log(newItem);
   items.push(newItem);
   res.status(200);
-  res.send("ok, new post created");
+  console.log(newItem.id);
+  res.json({id:newItem.id}) ;
 })
 
 //modify post
@@ -226,7 +223,6 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
             zipCode: req.body.location.zipCode,
             city: req.body.location.city
           };
-          items[i].imageNames = req.body.imageNames;
           items[i].askingPrice = req.body.askingPrice;
           items[i].deliveryType = {
             shipping: req.body.deliveryType.shipping,
@@ -236,7 +232,7 @@ app.put('/items/:itemid', validateSchema(itemSchema), passport.authenticate('jwt
         }
       }
       res.status(200);
-      res.send("ok, post modified");
+      res.json({id:itemInfo.id}) ;
     }
   }
   // no --> error, no such post with the id
@@ -280,8 +276,178 @@ app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (re
   }
 })
 
-//get posts
 
+app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4), (req, res) => {
+  itemInfo = doesItemExist(req.params.itemid) ;
+
+  if (itemInfo != null) {
+    let imgNames = [];
+    for (var i = 0; i < req.files.length; i ++) {
+      let correctFormat = req.files[0].originalname.split('.').pop() ;
+      let newName = req.files[i].filename + '.' + correctFormat ;
+      fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
+        if (err) throw err;
+      });
+      imgNames.push(newName);
+    }
+    for (var i = 0; i<items.length; i++) {
+      if (items[i].id == req.params.itemid) {
+        items[i].imageNames = imgNames;
+        console.log(items[i]);
+      }
+      break;
+    }   
+    res.status(200);
+    res.send('ok, pictures uploaded') 
+  }
+  // no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
+})
+
+app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete)/*, passport.authenticate('jwt', {session: false})*/, (req, res) => {
+  itemInfo = doesItemExist(req.params.itemid) ;
+
+  if (itemInfo != null) {
+    for (var i = 0; i<req.body.imageNames.length; i++) {
+      if(fs.existsSync('uploads/'+ req.body.imageNames[i])) {
+        fs.unlink('uploads/'+ req.body.imageNames[i], (err) =>{
+          if (err) throw err;
+        });
+      }
+    }
+    for (var i = 0; i<items.length; i++) {
+      if (items[i].id == req.params.itemid) {
+        for (var i = 0; i<req.body.imageNames.length; i++) {
+          const index = (itemInfo.imageNames.findIndex(name => name == req.body.imageNames[i]));
+          if (index != null) {
+            itemInfo.imageNames.splice(index, 1); 
+          }
+        }
+      }
+      break;
+    } 
+    res.status(200);
+    res.send("pictures deleted succesfully");
+  }
+  // no such post with the id
+  else {
+    res.status(406);
+    res.send("no item with the id");
+  }
+})
+
+
+
+//get posts
+// app.get('/items', (req, res) => {
+//   console.log(items);
+//   let searchFrom = items ;
+//   let searchedItems = []
+//   console.log(req.query) ;
+//   if (req.query.category != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].category == req.query.category) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log(searchFrom.category) ;
+//     console.log(req.query.category) ;
+//     console.log("category") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     searchFrom = searchedItems
+//   }
+//   if(req.query.city != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].city == req.query.city) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log("city") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     searchFrom = searchedItems
+//   }
+//   if(req.query.time != null) {
+//     for (var i = 0 ; i < searchFrom.length; i++) {
+//       if(searchFrom[i].time >= req.query.time) {
+//         searchedItems.push(items[i])
+//       }
+//     }
+//     console.log("time") ;
+//     console.log(searchedItems) ;
+//   }
+//   if (searchedItems.length >= 1) {
+//     console.log("final after searc")
+//     res.json(searchedItems) ;
+//   }
+//   else {
+//     console.log("final without searc")
+//     res.json(items) ;
+//   }
+// })
+function searchItemsBy(searchFrom, searchName, operator, searchBy1, searchBy2 ) {
+  var searchResult = [] ;
+  var equal = function(first, second) {
+    return first == second ;
+  }
+  var bigger = function(first, second) {
+    return first >= second ;
+  }
+  var chosenOperator = equal ;
+ 
+  if (operator == 'bigger') {
+    chosenOperator = bigger ;
+  }
+
+  if (searchBy2 != null) {
+   searchResult = searchFrom.filter(item => chosenOperator(item[searchBy1][searchBy2].toLowerCase(), searchName.toLowerCase()) );
+  }
+  else {
+    searchResult = searchFrom.filter(item => chosenOperator(item[searchBy1].toLowerCase(), searchName.toLowerCase())) ;
+  }  
+  return searchResult
+  // for (var i = 0 ; i < searchFrom.length; i++) {
+  //   console.log(searchFrom[i][searchBy]);
+
+  //   if(searchFrom[i].searchBy == searchBy) {
+  //     searchedItems.push(searchFrom[i])
+  //   }
+  // }
+  // return searchedItems
+}
+
+//get items, also searching by category, city or time is possible
+app.get('/items', (req, res) => {
+    var listOfSearchedItems = [] ;
+    var itemListForSearching = items ;
+    var numberOfSearches = 0 ;
+    if (req.query.category != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.category,'equal', 'category') ;
+      numberOfSearches ++ ;
+    }
+    if(numberOfSearches != 0) {itemListForSearching = listOfSearchedItems}
+    if (req.query.city != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.city, 'equal', 'location', 'city') ;
+      numberOfSearches ++ ;
+    }
+    if(numberOfSearches != 0) {itemListForSearching = listOfSearchedItems}
+    if (req.query.time != null) {
+      listOfSearchedItems = searchItemsBy(itemListForSearching, req.query.time, 'bigger', 'created') ; 
+      numberOfSearches ++ ;
+    }
+    if (numberOfSearches > 0) {
+      res.json(listOfSearchedItems) ;
+    }
+    else {
+      res.json(items);
+    }
+  })
 
 
 
