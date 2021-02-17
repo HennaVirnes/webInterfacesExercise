@@ -1,6 +1,6 @@
 const express = require('express') ;
 const app = express() ;
-const port = 3000 ;
+const port = process.env.PORT || 80
 const bodyParser = require('body-parser');
 const Ajv = require('ajv').default;
 const registerUserSchema = require('./schemas/registerUser.json');
