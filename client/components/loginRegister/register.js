@@ -73,9 +73,9 @@ export default function register(props) {
       <FormField placeholder='Lastname' maxLength={20} secure={false} setTextField={setLastName} textField={lastName}/> 
       <FormField placeholder='Username' maxLength={20} secure={false} setTextField={setUserName} textField={userName}/> 
       <FormField placeholder='phonenumber' maxLength={20} secure={false} setTextField={setPhoneNumber} textField={phoneNumber}/> 
-      <FormField placeholder='email' maxLength={20} secure={false} setTextField={setEmail} textField={email}/> 
-      <FormField placeholder='Password' maxLength={20} secure={true} setTextField={setPassword} textField={password}/> 
-      <FormField placeholder='Confirm Password' maxLength={20} secure={true} setTextField={setConfirmPassword} textField={confirmPassword}/> 
+      <FormField placeholder='email' maxLength={50} secure={false} setTextField={setEmail} textField={email}/> 
+      <FormField placeholder='Password' maxLength={50} secure={true} setTextField={setPassword} textField={password}/> 
+      <FormField placeholder='Confirm Password' maxLength={50} secure={true} setTextField={setConfirmPassword} textField={confirmPassword}/> 
       {passwordMatch}
       <LogRegButton text='Register' color='lightgrey' pressButton={pressButton}></LogRegButton>
       <Text onPress={() => props.navigation.navigate('login')}>I have already an account, to login</Text>

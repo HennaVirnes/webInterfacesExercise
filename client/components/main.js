@@ -21,11 +21,20 @@ export default function main(props) {
     }
   ]
 
+  let output =
+  <Text onPress={props.logOut}>to logout</Text>
+
+
+  if (props.loggedIn == false) {
+    output =
+    <Text onPress={() => props.navigation.navigate('login')}>to login</Text>
+  }
+
   return (
     <View>
       <Text>This is the main view</Text>
       {items.map(item => <Item key={item.id} price={item.price} title={item.title} location={item.location} source={item.source}/>)}
-      <Text onPress={() => props.navigation.navigate('login')}>to login</Text>
+      {output}
     </View>
   )
 }
