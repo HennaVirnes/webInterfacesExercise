@@ -4,7 +4,9 @@ import Icon from './loginRegisterIcon' ;
 import FormField from './formfield' ;
 import Title from './title' ;
 import LogRegButton from './logRegButton' ;
-import Warningtext from './warningtext'
+import Warningtext from './warningtext' ;
+import {apiAddress} from '../apiAddress' ;
+const axios = require('axios');
 
 
 export default function register(props) {
@@ -24,6 +26,44 @@ export default function register(props) {
       <Warningtext text='passwords are not matching'/>
     ); 
   }
+
+  function pressButton() {
+    const warnings = [];
+    if (firstName.length == 0
+      || lastName.length == 0
+      || phoneNumber.length == 0
+      || email.length == 0) {
+        warnings.push('\nAll fields are required'); 
+      }
+    if (userName.length <= 3) {
+      warnings.push('\nUsername must be longer than 2 characters')
+    }
+    if (password.length <= 5) {
+      warnings.push('\nPassword must be longer than 5 characters')
+    }
+    if (password != confirmPassword) {
+      warnings.push('\nPasswords are not matching')
+    }
+    if (warnings.length != 0 ) {
+      alert(warnings);
+    }
+    else {
+      axios.post(apiAddress+'users/register', {
+        username: userName,
+        password: password,
+        fName: firstName,
+        lName: lastName,
+        phoneNumber: phoneNumber,
+        email: email
+      })
+      .then(function (response) {
+        props.navigation.navigate('login') ;
+      })
+      .catch((error) => {
+        alert(error) ;
+      })
+    }
+  }
   
   return (
     <View>
@@ -37,7 +77,7 @@ export default function register(props) {
       <FormField placeholder='Password' maxLength={20} secure={true} setTextField={setPassword} textField={password}/> 
       <FormField placeholder='Confirm Password' maxLength={20} secure={true} setTextField={setConfirmPassword} textField={confirmPassword}/> 
       {passwordMatch}
-      <LogRegButton text='Register'></LogRegButton>
+      <LogRegButton text='Register' color='lightgrey' pressButton={pressButton}></LogRegButton>
       <Text onPress={() => props.navigation.navigate('login')}>I have already an account, to login</Text>
     </View>
   )

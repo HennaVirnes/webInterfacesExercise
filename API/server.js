@@ -20,7 +20,7 @@ const BasicStrategy = require('passport-http').BasicStrategy ;
 const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt;
-const jwtKey = require('./jwt-key.json').key;
+const jwtKey = process.env.key || require('./jwt-key.json').key;
 
 app.use(bodyParser.json());
 
