@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import Item from './items/item' ;
 
 export default function main(props) {
@@ -31,10 +31,12 @@ export default function main(props) {
   }
 
   return (
-    <View>
-      <Text>This is the main view</Text>
-      {items.map(item => <Item key={item.id} price={item.price} title={item.title} location={item.location} source={item.source}/>)}
-      {output}
+    <View style={{flex:1}}>
+      <ScrollView>
+        <Text>This is the main view</Text>
+        {items.map(item => <Item key={item.id} price={item.price} title={item.title} location={item.location} source={item.source}/>)}
+        {output}
+      </ScrollView>
     </View>
   )
 }

@@ -50,13 +50,19 @@ export default function login(props) {
 
   return (
     <View>
-      <Title title='LOGIN'></Title>
+      <Title paddingTop={'20%'} title='LOGIN'></Title>
       <Icon iconName='person-outline' />
       <FormField placeholder='Username' maxLength={20} secure={false} setTextField={setUserName} textField={userName}/> 
       <FormField placeholder='Password' maxLength={50} secure={true} setTextField={setPassword} textField={password}/>
       <LogRegButton pressButton={pressButton} color='lightgrey' text='Login'></LogRegButton>
-      <Text style={{padding:20}} onPress={() => props.navigation.navigate('register')}>Don't have account yet, to register</Text>
-      <Text style={{padding:20}} onPress={() => props.navigation.navigate('main')}>I want to browse without login, to shop</Text>
+      <Text style={{padding:20, alignSelf:'center'}}>
+        <Text>Don't have account yet, </Text>
+        <Text style={{textDecorationLine:'underline', color:'blue'}} onPress={() => props.navigation.navigate('register')}>to register</Text>        
+      </Text>
+      <Text style={{padding:20, alignSelf:'center'}} onPress={() => props.navigation.navigate('main')}>
+        <Text>I want to browse without login, </Text>
+        <Text style={{textDecorationLine:'underline', color:'blue'}}>to shop</Text>
+      </Text>
     </View>
   )
 }

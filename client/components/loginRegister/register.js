@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { View, Button, Text } from 'react-native'
+import { View, Button, Text, ScrollView } from 'react-native'
 import Icon from './loginRegisterIcon' ;
 import FormField from './formfield' ;
 import Title from './title' ;
@@ -66,19 +66,24 @@ export default function register(props) {
   }
   
   return (
-    <View>
-      <Title title='REGISTER'></Title>
-      <Icon iconName='person-add-outline' />
-      <FormField placeholder='Firstname' maxLength={20} secure={false} setTextField={setFirstName} textField={firstName}/> 
-      <FormField placeholder='Lastname' maxLength={20} secure={false} setTextField={setLastName} textField={lastName}/> 
-      <FormField placeholder='Username' maxLength={20} secure={false} setTextField={setUserName} textField={userName}/> 
-      <FormField placeholder='phonenumber' maxLength={20} secure={false} setTextField={setPhoneNumber} textField={phoneNumber}/> 
-      <FormField placeholder='email' maxLength={50} secure={false} setTextField={setEmail} textField={email}/> 
-      <FormField placeholder='Password' maxLength={50} secure={true} setTextField={setPassword} textField={password}/> 
-      <FormField placeholder='Confirm Password' maxLength={50} secure={true} setTextField={setConfirmPassword} textField={confirmPassword}/> 
-      {passwordMatch}
-      <LogRegButton text='Register' color='lightgrey' pressButton={pressButton}></LogRegButton>
-      <Text onPress={() => props.navigation.navigate('login')}>I have already an account, to login</Text>
+    <View style={{flex: 1}}>
+      <ScrollView>
+        <Title paddingTop={'10%'} title='REGISTER'></Title>
+        <Icon iconName='person-add-outline' />
+        <FormField placeholder='Firstname' maxLength={20} secure={false} setTextField={setFirstName} textField={firstName}/> 
+        <FormField placeholder='Lastname' maxLength={20} secure={false} setTextField={setLastName} textField={lastName}/> 
+        <FormField placeholder='Username' maxLength={20} secure={false} setTextField={setUserName} textField={userName}/> 
+        <FormField placeholder='phonenumber' maxLength={20} secure={false} setTextField={setPhoneNumber} textField={phoneNumber}/> 
+        <FormField placeholder='email' maxLength={50} secure={false} setTextField={setEmail} textField={email}/> 
+        <FormField placeholder='Password' maxLength={50} secure={true} setTextField={setPassword} textField={password}/> 
+        <FormField placeholder='Confirm Password' maxLength={50} secure={true} setTextField={setConfirmPassword} textField={confirmPassword}/> 
+        {passwordMatch}
+        <LogRegButton text='Register' color='lightgrey' pressButton={pressButton}></LogRegButton>
+        <Text style={{padding: 20, alignSelf:'center'}} onPress={() => props.navigation.navigate('login')}>
+          <Text>I have already an account, </Text>
+          <Text style={{textDecorationLine:'underline', color:'blue'}}>to login</Text>
+        </Text>
+      </ScrollView>
     </View>
   )
 }
