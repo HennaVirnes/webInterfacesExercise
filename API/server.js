@@ -21,8 +21,25 @@ const jwt = require('jsonwebtoken');
 const JwtStrategy = require('passport-jwt').Strategy,
       ExtractJwt = require('passport-jwt').ExtractJwt;
 const jwtKey = process.env.key || require('./jwt-key.json').key;
+const cloudinary = require('cloudinary').v2;
+const {CloudinaryStorage} = require('multer-storage-cloudinary');
 
 app.use(bodyParser.json());
+
+cloudinary.config({
+  cloud_name: process.env.cloud_name, 
+  api_key: process.env.api_key, 
+  api_secret: process.env.api_secret 
+})
+
+var storage = new CloudinaryStorage ({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'lumipallo',
+  },
+});
+
+const parser = multer({storage: storage});
 
 //http basic passport
 passport.use(new BasicStrategy(
@@ -277,18 +294,22 @@ app.delete('/items/:itemid', passport.authenticate('jwt', {session: false}), (re
 })
 
 
-app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), multerUpload.array('photos', 4), (req, res) => {
+app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}), parser.array('photos', 4), (req, res) => {
   itemInfo = doesItemExist(req.params.itemid) ;
-
+  console.log(req);
   if (itemInfo != null) {
     let imgNames = [];
     for (var i = 0; i < req.files.length; i ++) {
-      let correctFormat = req.files[0].originalname.split('.').pop() ;
-      let newName = req.files[i].filename + '.' + correctFormat ;
-      fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
-        if (err) throw err;
-      });
-      imgNames.push(newName);
+      //for saving on the /uploads folder on the server
+      // let correctFormat = req.files[0].originalname.split('.').pop() ;
+      // let newName = req.files[i].filename + '.' + correctFormat ;
+      // fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
+      //   if (err) throw err;
+      // });
+      //imgNames.push(newName);
+
+      let path = req.files[i].path ;
+      imgNames.push(path);
     }
     for (var i = 0; i<items.length; i++) {
       if (items[i].id == req.params.itemid) {
@@ -307,16 +328,25 @@ app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}
   }
 })
 
-app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete)/*, passport.authenticate('jwt', {session: false})*/, (req, res) => {
+app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete), passport.authenticate('jwt', {session: false}), (req, res) => {
   itemInfo = doesItemExist(req.params.itemid) ;
+  console.log(items);
 
   if (itemInfo != null) {
     for (var i = 0; i<req.body.imageNames.length; i++) {
-      if(fs.existsSync('uploads/'+ req.body.imageNames[i])) {
-        fs.unlink('uploads/'+ req.body.imageNames[i], (err) =>{
-          if (err) throw err;
-        });
-      }
+      //deleting image when it's in server /uploads folder
+      // if(fs.existsSync('uploads/'+ req.body.imageNames[i])) {
+      //   fs.unlink('uploads/'+ req.body.imageNames[i], (err) =>{
+      //     if (err) throw err;
+      //   });
+
+      // let correctFormat = req.files[0].originalname.split('.').pop() ;
+      // let newName = req.files[i].filename + '.' + correctFormat ;
+      // fs.rename(req.files[i].path, './uploads/' + newName, function (err) {
+      //   if (err) throw err;
+      // });
+      let nameFromPath = req.body.imageNames[i].split('/').pop().split('.').shift();
+      cloudinary.uploader.destroy('lumipallo/' + nameFromPath) ;      
     }
     for (var i = 0; i<items.length; i++) {
       if (items[i].id == req.params.itemid) {
@@ -324,12 +354,14 @@ app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete)/*, passport
           const index = (itemInfo.imageNames.findIndex(name => name == req.body.imageNames[i]));
           if (index != null) {
             itemInfo.imageNames.splice(index, 1); 
+            console.log('here');
           }
         }
       }
       break;
     } 
     res.status(200);
+    //console.log(items) ;
     res.send("pictures deleted succesfully");
   }
   // no such post with the id
@@ -459,7 +491,6 @@ app.get('/items', (req, res) => {
     res.status(200) ;
     res.json(cities);
   })
-
 
 
 

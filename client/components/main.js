@@ -24,6 +24,7 @@ export default function main(props) {
   //   }
   // ]
 
+
   let items ;
   let outputEmptySearch ;
 
@@ -43,7 +44,10 @@ export default function main(props) {
   }
 
   let loginLogout =
-  <Text style={{padding: 20}} onPress={props.logOut}>logout</Text>
+  <>
+    <Text style={{padding: 20}} onPress={props.logOut}>logout</Text>
+    <Text style={{padding: 20}} onPress={() => props.navigation.navigate('new item')}>Create new item</Text>
+  </>
 
   if (props.loggedIn == false) {
     loginLogout =
@@ -53,9 +57,9 @@ export default function main(props) {
   return (
     <View style={{flex:1}}>
       <ScrollView>
-        <Search setItems={setItemsToSearchedItems}></Search>
+        <Search setItems={setItemsToSearchedItems} categories={props.categories}></Search>
         <Text style={{alignSelf:'center'}}>All</Text>
-        {items.map(item => <Item key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={'testi'}/>)}
+        {items.map(item => <Item key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
         {loginLogout}
         <Text style={{alignSelf:'center', height: 500, fontSize: 20}}>{outputEmptySearch}</Text>
       </ScrollView>

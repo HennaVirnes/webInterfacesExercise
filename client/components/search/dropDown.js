@@ -7,12 +7,13 @@ export default function dropDown(props) {
 
   function test(item) {
     props.onChangeItem(item.value);
-    props.searchItems();
-    alert('we got this!');
+    if(props.searchItems) {
+      props.searchItems();
+    }
   }
 
   return (
-    <View>
+    <View style={{width: '75%', alignSelf:'center'}}>
       <DropDownPicker items={props.items}
                       searchable={true}
                       searchablePlaceholder={props.placeHolder}

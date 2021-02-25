@@ -6,6 +6,7 @@ import { createStackNavigator, HeaderBackground } from '@react-navigation/stack'
 import Login from './components/loginRegister/login' ;
 import Register from './components/loginRegister/register' ;
 import Main from './components/main' ;
+import NewItem from './components/newItem' ;
 import * as SecureStore from 'expo-secure-store';
 const axios = require('axios');
 import {apiAddress} from './components/apiAddress' ;
@@ -29,7 +30,17 @@ export default function App() {
       })
   },[]);
 
-
+  const categories = [
+    {label: 'nothing', value: null},
+    {label: 'clothes', value: 'clothes'},
+    {label: 'mugs', value: 'mugs'},
+    {label: 'animals', value: 'animals'},
+    {label: 'toys', value: 'toys'},
+    {label: 'electronics', value: 'electronics'},
+    {label: 'garden', value: 'garden'},
+    {label: 'cars', value: 'cars'},
+    {label: 'furniture', value: 'furniture'}
+  ]
 
 
   async function getToken() {
@@ -56,13 +67,16 @@ export default function App() {
           headerTitleAlign:'center'
       }}>
         <Stack.Screen name="main" options={{ title: 'MarketPalace' }}>
-          {props => <Main {...props} loggedIn={loggedIn} logOut={logOut} items={items} />}  
+          {props => <Main {...props} loggedIn={loggedIn} logOut={logOut} items={items} categories={categories} />}  
         </Stack.Screen>
         <Stack.Screen name="login">
-        {props => <Login {...props} logInOut={logInOut} />}  
+          {props => <Login {...props} logInOut={logInOut} />}  
         </Stack.Screen>
         <Stack.Screen name="register"  options={{ title: '' }}>
-        {props => <Register {...props} />}  
+          {props => <Register {...props} />}  
+        </Stack.Screen>
+        <Stack.Screen name="new item">
+          {props => <NewItem {...props} categories={categories} />}  
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

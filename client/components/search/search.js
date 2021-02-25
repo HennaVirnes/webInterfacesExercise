@@ -76,18 +76,6 @@ export default function search(props) {
 //     })
 // },[]);
 
-  const categories = [
-    {label: 'nothing', value: null},
-    {label: 'clothes', value: 'clothes'},
-    {label: 'mugs', value: 'mugs'},
-    {label: 'animals', value: 'animals'},
-    {label: 'toys', value: 'toys'},
-    {label: 'electronics', value: 'electronics'},
-    {label: 'garden', value: 'garden'},
-    {label: 'cars', value: 'cars'},
-    {label: 'furniture', value: 'furniture'}
-  ]
-
   const cities = [
     {label: 'nothing', value: null},
   ]
@@ -107,7 +95,7 @@ export default function search(props) {
   if(searchActive == true) {
     output = 
     <View>
-      <DropDown items={categories} placeHolder='Search by category' onChangeItem={setSearchCategory} searchItems={searchItems}/>
+      <DropDown items={props.categories} placeHolder='Search by category' onChangeItem={setSearchCategory} searchItems={searchItems}/>
       <DropDown items={cities} placeHolder='Search by city' onChangeItem={setSearchCity} searchItems={searchItems}/>
     </View>
   }
