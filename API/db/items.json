@@ -25,6 +25,29 @@
       "sellerId": "123e4567-e89b-12d3-a456-426614174000"
     },
     {
+      "id": "123e4567-e89b-12d3-a456-426614174018",
+      "title": "moominmug2",
+      "description": "rare moominmug",
+      "category": "mugs",
+      "location": {
+          "zipCode": 90520,
+          "city": "Oulu"
+      },
+      "imageNames": [
+          "picture1.jpg",
+          "picture33.jpg",
+          "picture15.jpg",
+          "picture2.jpg"
+      ],
+      "askingPrice": 100,
+      "deliveryType": {
+          "shipping": false,
+          "pickup": true
+      },
+      "created": "2021-02-04T12:35:18.192Z",
+      "sellerId": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    {
       "id": "123e4567-e89b-12d3-a456-426614174005",
       "title": "t-shirt",
       "description": "this is very nice t-shirt",
