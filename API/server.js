@@ -449,6 +449,17 @@ app.get('/items', (req, res) => {
     }
   })
 
+  app.get('/cities', (req,res) => {
+    const cities = [] ;
+    for (let i = 0; i< items.length; i++) {
+      if (!cities.includes(items[i].location.city)) {
+        cities.push(items[i].location.city)
+      }
+    }
+    res.status(200) ;
+    res.json(cities);
+  })
+
 
 
 
