@@ -38,6 +38,7 @@ export default function login(props) {
         }
       })
       .then(function (response) {
+        saveToken('userId', response.data.id);
         saveToken('token', response.data.token);
         props.logInOut(true);    
         props.navigation.navigate('main');

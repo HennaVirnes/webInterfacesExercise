@@ -186,8 +186,9 @@ app.post('/login', passport.authenticate('basic', {session: false}), (req, res) 
     expiresIn: '1d'
   }
   const token = jwt.sign(payload, jwtKey, options);
+  const id = req.user.id ;
   res.status(200) ;
-  return res.json({token})   
+  return res.json({token, id})   
 })
 
 //create a new post
@@ -314,9 +315,8 @@ app.put('/items/:itemid/pictures', passport.authenticate('jwt', {session: false}
     for (var i = 0; i<items.length; i++) {
       if (items[i].id == req.params.itemid) {
         items[i].imageNames = imgNames;
-        console.log(items[i]);
+        break;
       }
-      break;
     }   
     res.status(200);
     res.send('ok, pictures uploaded') 
@@ -369,6 +369,18 @@ app.delete('/items/:itemid/pictures', validateSchema(imagesToDelete), passport.a
     res.status(406);
     res.send("no item with the id");
   }
+})
+
+app.get('/items/:userid', (req, res) => {
+  let usersItems = [] ;
+  for ( let i = 0; i < items.length; i ++) {
+    if (items[i].sellerId == req.params.userid) {
+      usersItems.push(items[i]);
+    }
+  }
+  res.status(200);
+  console.log(usersItems);
+  res.json(usersItems);
 })
 
 

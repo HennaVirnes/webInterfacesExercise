@@ -90,7 +90,7 @@ function pressButton() {
       }
     })
     .then(function (response) {
-      props.navigation.navigate('main') ;
+      props.navigation.navigate('addPhoto', {itemId: response.data.id}) ;
     })
     .catch((error) => {
       alert(error) ;
@@ -101,13 +101,13 @@ function pressButton() {
   return (
     <View style={{padding: 20}}>
       <Text style={{alignSelf:'center'}}>Create new item</Text>
-      <FormField placeholder='Title' maxLength={20} secure={false} setTextField={setTitle} textField={title}/> 
-      <FormField placeholder='Description' maxLength={20} secure={false} setTextField={setDescription} textField={description}/>
+      <FormField placeholder='Title' maxLength={50} secure={false} setTextField={setTitle} textField={title}/> 
+      <FormField placeholder='Description' maxLength={200} secure={false} setTextField={setDescription} textField={description}/>
       <DropDown items={props.categories} placeHolder='Category' onChangeItem={setCategory}/>
-      <FormField placeholder='Zip Code' maxLength={20} secure={false} setTextField={setZipCode} textField={zipCode}/> 
+      <FormField placeholder='Zip Code' maxLength={7} secure={false} setTextField={setZipCode} textField={zipCode}/> 
       {zipCodeIsNumber}
       <FormField placeholder='City' maxLength={20} secure={false} setTextField={setCity} textField={city}/> 
-      <FormField placeholder='Price' maxLength={20} secure={false} setTextField={setAskingPrice} textField={askingPrice}/> 
+      <FormField placeholder='Price' maxLength={10} secure={false} setTextField={setAskingPrice} textField={askingPrice}/> 
       {priceIsNumber}
       <Text>Delivery</Text>
       <View style={{flexDirection:'row'}}>

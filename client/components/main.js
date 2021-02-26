@@ -1,28 +1,24 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { View, Text, ScrollView } from 'react-native'
 import Item from './items/item' ;
 import Search from './search/search' ;
+import {apiAddress} from './apiAddress' ;
+const axios = require('axios');
 
 export default function main(props) {
 
   const [itemsBySearch, setItems] = useState(null)
 
-  // const items= [
-  //   {
-  //     source: 'https://anna.fi/wp-content/uploads/s/f/ruokaohje/931589-red_velvet_kakku.jpg',
-  //     askingPrice: '10',
-  //     title: 'delicious cake mamma mia this is so good!',
-  //     location: 'Raahe',
-  //     id: 1
-  //   },
-  //   {
-  //     source: 'https://i.insider.com/5484d9d1eab8ea3017b17e29?width=600&format=jpeg&auto=webp',
-  //     askingPrice: '1000000',
-  //     title: 'doggy',
-  //     location: 'Hetta',
-  //     id: 2
-  //   }
-  // ]
+  
+  useEffect(() => {
+    axios.get(apiAddress+'items')
+    .then((response) => {
+      setItems(response.data);
+    })
+    .catch((error) => {
+      alert(error) ;
+    })
+},[]);
 
 
   let items ;
@@ -47,6 +43,7 @@ export default function main(props) {
   <>
     <Text style={{padding: 20}} onPress={props.logOut}>logout</Text>
     <Text style={{padding: 20}} onPress={() => props.navigation.navigate('new item')}>Create new item</Text>
+    <Text style={{padding: 20}} onPress={() => props.navigation.navigate('allPosts')}>See your posts</Text>
   </>
 
   if (props.loggedIn == false) {

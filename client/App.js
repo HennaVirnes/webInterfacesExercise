@@ -7,6 +7,8 @@ import Login from './components/loginRegister/login' ;
 import Register from './components/loginRegister/register' ;
 import Main from './components/main' ;
 import NewItem from './components/newItem' ;
+import AddPhoto from './components/photosForNewItem' ;
+import AllPosts from './components/usersposts/allPosts';
 import * as SecureStore from 'expo-secure-store';
 const axios = require('axios');
 import {apiAddress} from './components/apiAddress' ;
@@ -17,21 +19,29 @@ export default function App() {
 
   const [loggedIn, logInOut] = useState(false)
   const [items, setItems] = useState([])
+  const [createdId, setCreatedId] = useState('')
+  const [userId, setUserId] = useState('')
+  const [accessToken, setAccessToken] = useState('')
 
-  getToken();
-
-  useEffect(() => {
-      axios.get(apiAddress+'items')
-      .then((response) => {
-        setItems(response.data);
-      })
-      .catch((error) => {
-        alert(error) ;
-      })
+  // useEffect(() => {
+  //     axios.get(apiAddress+'items')
+  //     .then((response) => {
+  //       setItems(response.data);
+  //     })
+  //     .catch((error) => {
+  //       alert(error) ;
+  //     })
+  //     getToken();
+  //     getUserId();
+  // },[]);
+    useEffect(() => {
+      getToken();
+      getUserId();
   },[]);
 
   const categories = [
     {label: 'nothing', value: null},
+    {label: 'other', value: 'other'},
     {label: 'clothes', value: 'clothes'},
     {label: 'mugs', value: 'mugs'},
     {label: 'animals', value: 'animals'},
@@ -47,6 +57,17 @@ export default function App() {
     let result = await SecureStore.getItemAsync('token');
     if (result) {
       logInOut(true);
+      setAccessToken(result);
+    } else {
+      logInOut(false);
+    }
+  }
+
+  async function getUserId() {
+    let result = await SecureStore.getItemAsync('userId');
+    if (result) {
+      logInOut(true);
+      setUserId(result);
     } else {
       logInOut(false);
     }
@@ -70,21 +91,22 @@ export default function App() {
           {props => <Main {...props} loggedIn={loggedIn} logOut={logOut} items={items} categories={categories} />}  
         </Stack.Screen>
         <Stack.Screen name="login">
-          {props => <Login {...props} logInOut={logInOut} />}  
+          {props => <Login {...props} logInOut={logInOut} setUserId={setUserId} />}  
         </Stack.Screen>
         <Stack.Screen name="register"  options={{ title: '' }}>
           {props => <Register {...props} />}  
         </Stack.Screen>
         <Stack.Screen name="new item">
-          {props => <NewItem {...props} categories={categories} />}  
+          {props => <NewItem {...props} categories={categories} setCreatedId={setCreatedId}/>}  
+        </Stack.Screen>
+        <Stack.Screen name="addPhoto">
+          {props => <AddPhoto {...props} createdId={createdId}/>}  
+        </Stack.Screen>
+        <Stack.Screen name="allPosts" options={{ title: 'My posts' }}>
+          {props => <AllPosts {...props} userId={userId} accessToken={accessToken}/>}  
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-
-// <Stack.Screen name="Home">
-//   {props => <HomeScreen {...props} extraData={someData} />}
-// </Stack.Screen>
 
