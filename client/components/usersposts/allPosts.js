@@ -8,9 +8,11 @@ const axios = require('axios');
 export default function allPosts(props) {
 
 const [items, setItems] = useState('')
+const [modal, setModal] = useState(false)
+const [itemId, setItemId] = useState('')
 
 
-useEffect(() => {
+function getItems() {
   axios.get(apiAddress+'items/'+props.userId)
   .then((response) => {
     setItems(response.data);
@@ -18,7 +20,13 @@ useEffect(() => {
   .catch((error) => {
     alert(error) ;
   })
-},[]);
+}
+
+useEffect(() => {
+  const unsubscribe = props.navigation.addListener('focus', () => {
+  getItems();
+});
+return unsubscribe;},[props.navigation]);
 
 
 function deleteItem(itemId) {
@@ -26,11 +34,34 @@ function deleteItem(itemId) {
     'Authorization': `Bearer ${props.accessToken}`
   }})
   .then((response) => {
-    alert('we deleted it')
+    setModal(false);
+    setItemId('');
   })
   .catch((error) => {
     console.log(error) ;
   })
+}
+
+let deleteOrNot ;
+
+if (modal == true) {
+  deleteOrNot = 
+  <View style={{position:'absolute', top: 250, borderRadius: 10, padding:10, backgroundColor:'white', height: 200, width: 250, alignSelf:'center' }}>
+    <Text style={{flex: 2, textAlign:'center', fontSize:25}}>Do you really want to delete this item?</Text>
+    <View style={{flex: 1, flexDirection:'row', justifyContent: 'space-evenly', paddingTop: 20}}>
+      <Text onPress={() => deleteItem(itemId)} style={{backgroundColor: 'red', borderRadius: 5, height: 30, width: 80, textAlign:'center', padding: 5, fontWeight:'bold'}}>DELETE</Text>
+      <Text onPress={cancelDelete} style={{backgroundColor: 'lightgrey', borderRadius: 5, height: 30, width: 80, textAlign:'center', padding: 5, fontWeight:'bold'}}>CANCEL</Text>
+    </View>
+  </View>
+}
+function askForDelete(id) {
+  setModal(true);
+  setItemId(id)
+}
+
+function cancelDelete() {
+  setModal(false);
+  setItemId('');
 }
 
 function modifyItem(item){
@@ -52,7 +83,7 @@ function modifyItem(item){
                                location={item.location.city} 
                                source={item.imageNames[0]}
                                item ={item}
-                               delete={deleteItem}
+                               delete={askForDelete}
                                modify={modifyItem}/>
       )}
     </>
@@ -62,6 +93,7 @@ function modifyItem(item){
   return (
     <View>
       {output}
+      {deleteOrNot}
     </View>
   )
 }

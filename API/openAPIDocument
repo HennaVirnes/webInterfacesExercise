@@ -1,0 +1,421 @@
+I wanted to update the document in stoplight.io for matching some modifications that I've made to the API.
+For some reason, the stoplight didn't allow me to do it. It stated that "only the project owner can edit this project". 
+And since I should be the project owner, I don't know what is going on?
+
+
+openapi: 3.0.0
+info:
+  title: WI-GradedExercise
+  version: '1.0'
+  description: API for the graded exrecise
+  contact:
+    email: you@your-company.com
+servers:
+  - url: 'https://lumi-pallo.herokuapp.com/'
+tags:
+  - name: users
+    description: these are related to users
+  - name: items
+    description: these are related to items
+paths:
+  /users/register:
+    post:
+      summary: ''
+      tags:
+        - users
+      operationId: post-users-register
+      responses:
+        '201':
+          description: new user created
+        '400':
+          description: 'Bad Request, some fields are missing/wrong type'
+        '406':
+          description: 'Not Acceptable, username already in use'
+          content:
+            text/html:
+              schema:
+                type: object
+                properties: {}
+      description: Create a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: titityy
+                  minLength: 2
+                  maxLength: 20
+                  description: username for the new user
+                password:
+                  type: string
+                  format: password
+                  minLength: 5
+                  maxLength: 50
+                  description: ''
+                lName:
+                  type: string
+                  example: John
+                  maxLength: 20
+                phoneNumber:
+                  type: string
+                  example: 040 4534455
+                  maxLength: 20
+                email:
+                  type: string
+                  format: email
+                  example: qwerty@asdfg.fi
+                  maxLength: 50
+                fName:
+                  type: string
+                  example: Doe
+                  maxLength: 20
+              required:
+                - username
+                - password
+                - lName
+                - phoneNumber
+                - email
+                - fName
+            examples:
+              example-1:
+                value:
+                  username: titityy
+                  password: pa$$word
+                  lName: John
+                  phoneNumber: 040 4534455
+                  email: qwerty@asdfg.fi
+                  fName: Doe
+        description: ''
+  /login:
+    post:
+      summary: ''
+      operationId: post-login
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: the user uses username and password for login into system
+      security:
+        - http-basic: []
+      parameters:
+        - schema:
+            type: string
+            example: Basic am9obmRvZTpxd2VydHk=
+          in: header
+          name: Authorization
+          description: username and password in base64
+          required: true
+  /items:
+    post:
+      tags:
+        - items
+      summary: ''
+      operationId: post-items-new
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+      description: User can post a new item for sale
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                '':
+                  $ref: '#/components/schemas/item-going-to-be-created'
+        description: The needed information of the product to be sold
+      security:
+        - http-bearer token: []
+    parameters: []
+    get:
+      summary: ''
+      operationId: get-items
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/item-in-database'
+        '400':
+          description: Bad Request
+      parameters:
+        - schema:
+            type: string
+            example: clothes
+          in: query
+          name: category
+          description: search by category
+        - schema:
+            type: string
+            example: oulu
+          in: query
+          name: city
+          description: search items by city
+        - schema:
+            type: string
+            example: '2021-02-03T12:57:59.597Z'
+          in: query
+          name: time
+          description: search items by their creation date
+      description: get all the items or get some items based on search
+  '/items/{itemid}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        name: itemid
+        in: path
+        required: true
+        description: id for the item to be deleted
+    put:
+      summary: ''
+      tags:
+        - items
+      operationId: put-items-itemid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '406':
+          description: 'Not Acceptable, item with that id doesn''t exist'
+      description: modify previously created item
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                '':
+                  $ref: '#/components/schemas/item-in-database'
+            examples:
+              example-1:
+                value:
+                  '':
+                    id: 123e4567-e89b-12d3-a456-426614174000
+                    title: moominmug niiskuneiti
+                    description: 'unused moominmug, sticker still in place'
+                    category: kitchen
+                    location:
+                      zipCode: '90520'
+                      city: Oulu
+                    images: string
+                    askingPrice: '20'
+                    deliveryType:
+                      shipping: true
+                      pickup: true
+                    sellerId: 123e4567-e89b-12d3-a456-426614174000
+        description: ''
+      security:
+        - http-bearer token: []
+    delete:
+      summary: ''
+      tags:
+        - items
+      operationId: delete-items-itemid
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: delete an item based on its id
+      security:
+        - http-bearer token: []
+  '/items/:itemid/pictures':
+    put:
+      summary: ''
+      operationId: 'put-items-:itemid-pictures'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: uploading images to the server + imagenames to the item
+      security:
+        - http-bearer token: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema: {}
+        description: max 4 images
+    parameters: []
+components:
+  schemas:
+    item-in-database:
+      title: item
+      type: object
+      x-examples:
+        example-1:
+          id: 123e4567-e89b-12d3-a456-426614174000
+          title: moominmug niiskuneiti
+          description: 'unused moominmug, sticker still in place'
+          category: kitchen
+          location:
+            zipCode: '90520'
+            city: Oulu
+          images: string
+          askingPrice: '20'
+          deliveryType:
+            shipping: true
+            pickup: true
+          sellerId: 123e4567-e89b-12d3-a456-426614174000
+        example-2:
+          id: 123e4567-e89b-12d3-a456-426614174000
+          title: moominmug niiskuneiti
+          description: 'unused moominmug, sticker still in place'
+          category: kitchen
+          location:
+            zipCode: '90520'
+            city: Oulu
+          images: string
+          askingPrice: '20'
+          deliveryType:
+            shipping: true
+            pickup: true
+          sellerId: 123e4567-e89b-12d3-a456-426614174000
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        title:
+          type: string
+          example: moominmug niiskuneiti
+          maxLength: 75
+        description:
+          type: string
+          example: 'unused moominmug, sticker still in place'
+          maxLength: 400
+        category:
+          type: string
+          example: kitchen
+        location:
+          type: object
+          properties:
+            zipCode:
+              type: string
+              example: '90520'
+            city:
+              type: string
+              example: Oulu
+        imageNames:
+          type: array
+          items:
+            type: string
+        askingPrice:
+          type: string
+          example: '20'
+        deliveryType:
+          type: object
+          properties:
+            shipping:
+              type: boolean
+            pickup:
+              type: boolean
+        sellerId:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        created:
+          type: string
+          format: date-time
+          example: '2021-02-03T12:57:59.597Z'
+      description: ''
+    item-going-to-be-created:
+      title: item-going-to-be-created
+      type: object
+      x-examples:
+        example-1:
+          id: 123e4567-e89b-12d3-a456-426614174000
+          title: flowerpot
+          description: 'I''m bad with plants, so I''m getting rid of this stupid thing!!!1'
+          category: home
+          location:
+            zipCode: '92240'
+            city: Lasikangas
+          imageName:
+            - image1.jpg
+          askingPrice: '0.50'
+          deliveryType:
+            shipping: true
+            pickup: true
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        title:
+          type: string
+          example: flowerpot
+        description:
+          type: string
+          example: 'I''m bad with plants, so I''m getting rid of this stupid thing!!!1'
+        category:
+          type: string
+          example: home
+        location:
+          type: object
+          properties:
+            zipCode:
+              type: string
+              example: '92240'
+            city:
+              type: string
+              example: Lasikangas
+        imageName:
+          type: array
+          items:
+            type: string
+            example: image1.jpg
+        askingPrice:
+          type: string
+          example: '0.50'
+        deliveryType:
+          type: object
+          properties:
+            shipping:
+              type: boolean
+            pickup:
+              type: boolean
+  securitySchemes:
+    http-basic:
+      type: http
+      scheme: basic
+      description: ''
+    http-bearer token:
+      type: http
+      scheme: bearer

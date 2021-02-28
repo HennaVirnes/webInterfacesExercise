@@ -12,9 +12,6 @@ export default function search(props) {
   const [searchCity, setSearchCity] = useState(null)
   const [citiesFromServer, setCities] = useState('')
 
-
-//test();
-
   useEffect(() => {
     axios.get(apiAddress+'cities')
     .then((response) => {
@@ -25,15 +22,6 @@ export default function search(props) {
     })
   },[]);
 
-  function test() {
-    if(searchCategory != null) {
-      alert('not null ' + searchCategory)
-    }
-    if(searchCategory == null) {
-      alert('is null ' + searchCategory)
-    }
-    
-  }
 
   function searchItems() {
     axios.get(apiAddress+'items', {
@@ -44,7 +32,6 @@ export default function search(props) {
     })
     .then((response) => {
       props.setItems(response.data);
-      alert(searchCategory + ' ' + searchCity)
     })
     .catch((error) => {
       alert(error) ;
@@ -55,26 +42,10 @@ export default function search(props) {
     if (searchActive == true) {
       setSearchCategory(null);
       setSearchCity(null);
-      props.setItems(props.items) ;
+      searchItems();
     }
     changeActivity(!searchActive);
   }
-
-//   useEffect(() => {
-//     axios.get(apiAddress+'items', {
-//       params: {
-//         category: searchCategory,
-//         city: searchCity
-//       }
-//     })
-//     .then((response) => {
-//       props.setItems(response.data);
-//       alert('somethign happened here?');
-//     })
-//     .catch((error) => {
-//       alert(error) ;
-//     })
-// },[]);
 
   const cities = [
     {label: 'nothing', value: null},
@@ -102,7 +73,7 @@ export default function search(props) {
 
   return (
     <View>
-      <Text onPress={()=> searchActivity()}>Press for search options</Text>
+      <Text style={{paddingLeft: 30, paddingBottom:10, paddingTop:10}} onPress={()=> searchActivity()}>Press for search options</Text>
       {output}
     </View>
   )

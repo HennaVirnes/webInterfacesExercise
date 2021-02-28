@@ -46,7 +46,6 @@ openImagePickerAsync = async () => {
       name: fileName,
       type: 'image/jpeg'
     });
-    postForm.append('foo', 'bar');
     setIsSubmitting(true);
     axios({
       method: 'put',
@@ -70,12 +69,11 @@ openImagePickerAsync = async () => {
 
 
   return (
-    <View>
-    <Text> Image Picker </Text>
-
+    <View style={{width: '75%', alignSelf:'center', marginTop: '20%'}}>
+      <Text style={{fontSize:30, textAlign:'center', paddingBottom: '10%'}}>Choose an image from your phone for the item:</Text>
     { isSubmitting ? <ActivityIndicator /> :
-      <TouchableOpacity onPress={openImagePickerAsync} style={{ borderWidth: 1, borderColor: 'black'}}>
-      <Text>Pick a photo and start upload</Text>
+      <TouchableOpacity onPress={openImagePickerAsync} style={{ backgroundColor: '#DAF7A6', borderRadius:10, height: 75, width:150, alignSelf:'center'}}>
+      <Text style={{textAlign:'center', paddingTop: 20, fontSize:20 }}>Choose photo</Text>
     </TouchableOpacity>
     }
 

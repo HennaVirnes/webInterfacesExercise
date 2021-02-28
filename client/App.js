@@ -76,6 +76,7 @@ export default function App() {
 
   async function logOut() {
     await SecureStore.deleteItemAsync('token');
+    await SecureStore.deleteItemAsync('userId');
     logInOut(false);
   }
 
@@ -85,7 +86,7 @@ export default function App() {
         screenOptions={{
           headerStyle: {
             backgroundColor: '#DAF7A6'
-          },
+          }, 
           headerTitleAlign:'center'
       }}>
         <Stack.Screen name="main" options={{ title: 'MarketPalace' }}>

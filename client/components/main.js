@@ -7,10 +7,9 @@ const axios = require('axios');
 
 export default function main(props) {
 
-  const [itemsBySearch, setItems] = useState(null)
+  const [itemsBySearch, setItems] = useState(props.items)
 
-  
-  useEffect(() => {
+  function getItems() {
     axios.get(apiAddress+'items')
     .then((response) => {
       setItems(response.data);
@@ -18,19 +17,16 @@ export default function main(props) {
     .catch((error) => {
       alert(error) ;
     })
-},[]);
+  }
+  
+  useEffect(() => {
+    const unsubscribe = props.navigation.addListener('focus', () => {
+      getItems();
+  }); return unsubscribe; },[props.navigation]);
 
-
-  let items ;
   let outputEmptySearch ;
 
-  if(itemsBySearch == null) {
-    items = props.items ;
-  }
-  else {
-    items = itemsBySearch ;
-  }
-  if(items.length == 0) {
+  if(itemsBySearch.length == 0) {
     outputEmptySearch = 'No items with given search parameters' ;
   }
 
@@ -55,8 +51,7 @@ export default function main(props) {
     <View style={{flex:1}}>
       <ScrollView>
         <Search setItems={setItemsToSearchedItems} categories={props.categories}></Search>
-        <Text style={{alignSelf:'center'}}>All</Text>
-        {items.map(item => <Item key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
+        {itemsBySearch.map(item => <Item key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
         {loginLogout}
         <Text style={{alignSelf:'center', height: 500, fontSize: 20}}>{outputEmptySearch}</Text>
       </ScrollView>

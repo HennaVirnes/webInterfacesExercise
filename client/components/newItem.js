@@ -79,7 +79,7 @@ function pressButton() {
         city: city
       },
       imageNames: [],
-      askingPrice: parseInt(askingPrice),
+      askingPrice: parseFloat(askingPrice),
       deliveryType: {
         shipping: shipping,
         pickup: pickUp
