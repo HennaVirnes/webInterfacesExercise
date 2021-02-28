@@ -33,6 +33,10 @@ function deleteItem(itemId) {
   })
 }
 
+function modifyItem(item){
+  props.navigation.navigate('modifyPost', item );
+}
+
   let output = 
   <View>
     <Text>You don't have any posts yet</Text>
@@ -41,8 +45,16 @@ function deleteItem(itemId) {
   if(items.length > 0) {
     output = 
     <>
-      {items.map(item => <Item key={item.id} id={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]} delete={deleteItem}/>
-                        )}
+      {items.map(item => <Item key={item.id} 
+                               id={item.id} 
+                               price={item.askingPrice} 
+                               title={item.title} 
+                               location={item.location.city} 
+                               source={item.imageNames[0]}
+                               item ={item}
+                               delete={deleteItem}
+                               modify={modifyItem}/>
+      )}
     </>
   }
 

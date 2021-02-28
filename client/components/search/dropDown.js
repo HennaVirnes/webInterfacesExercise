@@ -18,7 +18,9 @@ export default function dropDown(props) {
                       searchable={true}
                       searchablePlaceholder={props.placeHolder}
                       searchablePlaceholderTextColor='grey'
+                      placeholder={props.placeHolder}
                       dropDownMaxHeight={400}
+                      defaultValue = {props.defaultValue}
                       onChangeItem={item => test(item) }
       />
     </View>

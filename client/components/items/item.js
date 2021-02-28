@@ -1,13 +1,19 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 import Img from './itemimg'
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function item(props) {
 
   let canDelete ;
+  let canModify ;
   if(props.delete) {
     canDelete = 
     <Text style={{color: 'red'}} onPress={() => {props.delete(props.id)}}>X</Text>
+
+    canModify =
+    <Ionicons onPress={() => {props.modify(props.item)}} name='pencil-outline' size={20} color='grey' style={{position:'absolute', right: '10%', marginTop:10}} />
   }
 
   return (
@@ -18,6 +24,7 @@ export default function item(props) {
         <Text style={{color:'grey'}}>{props.location}</Text>
       </View>
       <Text style={{flex: 1, alignSelf:'center', fontSize: 20}}>{props.price} €</Text>
+      {canModify}
       {canDelete}
     </View>
   )
