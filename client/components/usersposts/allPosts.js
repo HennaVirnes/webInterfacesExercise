@@ -83,6 +83,7 @@ function modifyItem(item){
                                location={item.location.city} 
                                source={item.imageNames[0]}
                                item ={item}
+                               navigation={props.navigation}
                                delete={askForDelete}
                                modify={modifyItem}/>
       )}

@@ -10,6 +10,7 @@ import NewItem from './components/newItem' ;
 import AddPhoto from './components/photosForNewItem' ;
 import AllPosts from './components/usersposts/allPosts';
 import ModifyPost from './components/usersposts/modifyPost';
+import OneItemView from './components/items/oneItemView';
 import * as SecureStore from 'expo-secure-store';
 const axios = require('axios');
 import {apiAddress} from './components/apiAddress' ;
@@ -109,6 +110,9 @@ export default function App() {
         </Stack.Screen>
         <Stack.Screen name="modifyPost" options={{ title: 'Modify' }}>
           {props => <ModifyPost {...props} categories={categories} accessToken={accessToken}/>}  
+        </Stack.Screen>
+        <Stack.Screen name="one item" options={{ title: 'Details' }}>
+          {props => <OneItemView {...props} />}  
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>

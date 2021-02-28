@@ -51,7 +51,7 @@ export default function main(props) {
     <View style={{flex:1}}>
       <ScrollView>
         <Search setItems={setItemsToSearchedItems} categories={props.categories}></Search>
-        {itemsBySearch.map(item => <Item key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
+        {itemsBySearch.map(item => <Item navigation={props.navigation} item={item} key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
         {loginLogout}
         <Text style={{alignSelf:'center', height: 500, fontSize: 20}}>{outputEmptySearch}</Text>
       </ScrollView>
