@@ -30,11 +30,6 @@ export default function main(props) {
     outputEmptySearch = 'No items with given search parameters' ;
   }
 
-  function setItemsToSearchedItems(newItems) {
-    setItems(newItems);
-    items = newItems ;
-  }
-
   let loginLogout =
   <>
     <Text style={{padding: 20}} onPress={props.logOut}>logout</Text>
@@ -50,7 +45,7 @@ export default function main(props) {
   return (
     <View style={{flex:1}}>
       <ScrollView>
-        <Search setItems={setItemsToSearchedItems} categories={props.categories}></Search>
+        <Search setItems={setItems} categories={props.categories}></Search>
         {itemsBySearch.map(item => <Item navigation={props.navigation} item={item} key={item.id} price={item.askingPrice} title={item.title} location={item.location.city} source={item.imageNames[0]}/>)}
         {loginLogout}
         <Text style={{alignSelf:'center', height: 500, fontSize: 20}}>{outputEmptySearch}</Text>

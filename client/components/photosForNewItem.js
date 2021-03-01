@@ -76,6 +76,10 @@ openImagePickerAsync = async () => {
       <Text style={{textAlign:'center', paddingTop: 20, fontSize:20 }}>Choose photo</Text>
     </TouchableOpacity>
     }
+    <View style={{margin: 20, backgroundColor: 'lightgrey', borderRadius:10, height: 75, width:150, alignSelf:'center'}}>
+      <Text onPress={() => props.navigation.navigate('main')} style={{textAlign:'center', paddingTop: 20, fontSize:20 }}>No photo</Text>
+    </View>
+    
 
   </View>
   )
